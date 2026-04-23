@@ -57,6 +57,7 @@ function toggleMobileMenu() {
     const menu = document.getElementById('mobile-menu');
     if (menu) menu.classList.toggle('show');
 }
+
 function closeMobileMenu() {
     const menu = document.getElementById('mobile-menu');
     if (menu) menu.classList.remove('show');
@@ -68,7 +69,8 @@ function closeMobileMenu() {
 
 let isUpdatingHash = false;
 
-function showPage(pageName, scrollToBooks = false) {
+function showPage(pageName, scrollToBooksFlag = false) {
+    console.log('showPage called with:', pageName);
     window.scrollTo(0, 0);
     
     if (!isUpdatingHash && window.location.hash.slice(1).split('?')[0] !== pageName) {
@@ -79,28 +81,65 @@ function showPage(pageName, scrollToBooks = false) {
     
     document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active-page'));
     
-    const pageMap = {
-        'home': () => document.getElementById('home-page').classList.add('active-page'),
-        'shop': () => { document.getElementById('shop-page').classList.add('active-page'); loadAllProducts(); },
-        'product-detail': () => document.getElementById('product-detail-page').classList.add('active-page'),
-        'search': () => { document.getElementById('search-page').classList.add('active-page'); document.getElementById('search-results').innerHTML = ''; document.getElementById('search-input').value = ''; },
-        'admin-login': () => document.getElementById('admin-login-page').classList.add('active-page'),
-        'admin-dashboard': () => { if (state.isAdminLoggedIn) { document.getElementById('admin-dashboard-page').classList.add('active-page'); renderAdminPanels(); } else showPage('admin-login'); },
-        'about': () => { document.getElementById('about-page').classList.add('active-page'); if (scrollToBooks) setTimeout(() => { const books = document.querySelector('.books-container'); if (books) books.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200); },
-        'terms': () => document.getElementById('terms-page').classList.add('active-page'),
-        'privacy': () => document.getElementById('privacy-page').classList.add('active-page'),
-        'contact': () => document.getElementById('contact-page').classList.add('active-page'),
-        'profile': () => {
-            if (state.isAdminLoggedIn) showPage('admin-dashboard');
-            else document.getElementById('profile-page').classList.add('active-page');
+    if (pageName === 'home') {
+        document.getElementById('home-page').classList.add('active-page');
+    } else if (pageName === 'shop') {
+        document.getElementById('shop-page').classList.add('active-page');
+        loadAllProducts();
+    } else if (pageName === 'product-detail') {
+        document.getElementById('product-detail-page').classList.add('active-page');
+    } else if (pageName === 'search') {
+        document.getElementById('search-page').classList.add('active-page');
+        const resultsDiv = document.getElementById('search-results');
+        if (resultsDiv) resultsDiv.innerHTML = '';
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) searchInput.value = '';
+    } else if (pageName === 'admin-login') {
+        document.getElementById('admin-login-page').classList.add('active-page');
+    } else if (pageName === 'admin-dashboard') {
+        if (state.isAdminLoggedIn) {
+            document.getElementById('admin-dashboard-page').classList.add('active-page');
+            renderAdminPanels();
+        } else {
+            showPage('admin-login');
         }
-    };
+    } else if (pageName === 'about') {
+        document.getElementById('about-page').classList.add('active-page');
+        if (scrollToBooksFlag) {
+            setTimeout(() => {
+                const books = document.querySelector('.books-container');
+                if (books) books.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+        }
+    } else if (pageName === 'terms') {
+        document.getElementById('terms-page').classList.add('active-page');
+    } else if (pageName === 'privacy') {
+        document.getElementById('privacy-page').classList.add('active-page');
+    } else if (pageName === 'contact') {
+        document.getElementById('contact-page').classList.add('active-page');
+    } else if (pageName === 'profile') {
+        if (state.isAdminLoggedIn) {
+            showPage('admin-dashboard');
+        } else {
+            document.getElementById('profile-page').classList.add('active-page');
+        }
+    }
     
-    if (pageMap[pageName]) pageMap[pageName]();
-    
+    // Update active nav item
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    const navMap = { 'home': 'nav-home', 'shop': 'nav-shop', 'search': 'nav-search', 'profile': 'nav-profile', 'admin-login': 'nav-profile', 'admin-dashboard': 'nav-profile' };
-    if (navMap[pageName]) document.getElementById(navMap[pageName])?.classList.add('active');
+    if (pageName === 'home') {
+        const navHome = document.getElementById('nav-home');
+        if (navHome) navHome.classList.add('active');
+    } else if (pageName === 'shop' || pageName === 'product-detail') {
+        const navShop = document.getElementById('nav-shop');
+        if (navShop) navShop.classList.add('active');
+    } else if (pageName === 'search') {
+        const navSearch = document.getElementById('nav-search');
+        if (navSearch) navSearch.classList.add('active');
+    } else if (pageName === 'profile' || pageName === 'admin-login' || pageName === 'admin-dashboard') {
+        const navProfile = document.getElementById('nav-profile');
+        if (navProfile) navProfile.classList.add('active');
+    }
 }
 
 function handleHashChange() {
@@ -154,7 +193,7 @@ function productCardHTML(p) {
     const reviewCount = p.review_count || 24;
     const stars = generateStarRating(rating);
     const shareButton = state.isAdminLoggedIn ? 
-        `<button class="btn-share-wa-status" onclick="shareToWhatsAppStatus(${p.id}); event.stopPropagation();">
+        `<button class="btn-share-wa-status" onclick="window.shareToWhatsAppStatus(${p.id}); event.stopPropagation();">
             <i class="fab fa-whatsapp"></i> Share to Status
         </button>` : '';
     return `<div class="product-card" onclick="window.showProductDetail(${p.id})">
@@ -175,15 +214,21 @@ function productCardHTML(p) {
 // ============================================
 
 async function showProductDetail(productId) {
+    console.log('showProductDetail called for:', productId);
     const { data, error } = await supabase
         .from('products')
         .select('*, categories(name), subcategories(name)')
         .eq('id', productId)
         .single();
-    if (error || !data) { showToast('Product not found', 'error'); return; }
+    if (error || !data) { 
+        showToast('Product not found', 'error'); 
+        return; 
+    }
     
     const product = data;
     const container = document.getElementById('product-detail-container');
+    if (!container) return;
+    
     const stars = generateStarRating(product.rating || 4.5);
     const imageContent = product.image_url 
         ? `<img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" style="width:100%;height:100%;object-fit:cover;">`
@@ -205,8 +250,8 @@ async function showProductDetail(productId) {
                     <h4>Description</h4>
                     <p>${product.description || 'No description available'}</p>
                 </div>
-                <button class="btn-primary" onclick="buyNow(${product.id})"><i class="fab fa-whatsapp"></i> Buy Now via WhatsApp</button>
-                <button class="btn-secondary" style="margin-top:12px;" onclick="showPage('shop')">← Back to Products</button>
+                <button class="btn-primary" onclick="window.buyNow(${product.id})"><i class="fab fa-whatsapp"></i> Buy Now via WhatsApp</button>
+                <button class="btn-secondary" style="margin-top:12px;" onclick="window.showPage('shop')">← Back to Products</button>
             </div>
         </div>
     `;
@@ -219,7 +264,10 @@ async function showProductDetail(productId) {
 
 async function buyNow(productId) {
     const { data, error } = await supabase.from('products').select('*').eq('id', productId).single();
-    if (error || !data) { showToast('Product not found', 'error'); return; }
+    if (error || !data) { 
+        showToast('Product not found', 'error'); 
+        return; 
+    }
     const whatsapp = state.siteSettings?.whatsapp_number || ENV.WHATSAPP_NUMBER;
     const message = `Hello Abihani Express!%0a%0aI'm interested in buying:%0a🛍️ ${data.name}%0a💰 ₦${data.price?.toLocaleString()}%0a%0aPlease provide payment details.`;
     const cleanNumber = whatsapp.replace(/[^0-9]/g, '');
@@ -231,8 +279,12 @@ async function buyNow(productId) {
 // ============================================
 
 async function loadSiteSettings() {
+    console.log('Loading site settings...');
     const { data, error } = await supabase.from('site_settings').select('*').eq('id', 1).single();
-    if (error) { console.error('Error loading site settings:', error); return; }
+    if (error) { 
+        console.error('Error loading site settings:', error); 
+        return; 
+    }
     
     state.siteSettings = data;
     
@@ -249,7 +301,8 @@ async function loadSiteSettings() {
     if (logoH1) logoH1.textContent = data.site_name || 'Abihani Express';
     const logoSpan = document.querySelector('.logo span');
     if (logoSpan) logoSpan.textContent = data.slogan || 'MOM · DAD · UMMIHANI';
-    document.getElementById('copyright').innerHTML = `© 2026 ${data.site_name || 'Abihani Express'}`;
+    const copyrightSpan = document.getElementById('copyright');
+    if (copyrightSpan) copyrightSpan.innerHTML = `© 2026 ${data.site_name || 'Abihani Express'}`;
     const footerText = document.getElementById('footer-text');
     if (footerText) footerText.textContent = data.footer_text || 'Buy for Mom. Dad. Ummihani. 🎉';
     const footerSiteName = document.getElementById('footer-site-name');
@@ -309,16 +362,20 @@ async function loadAllProducts(categoryId = null) {
 
 function renderSlider() {
     const container = document.getElementById('slider-container');
+    if (!container) return;
+    
     if (!state.sliders || state.sliders.length === 0) {
         container.innerHTML = `<div class="slider-card"><h2>Welcome to Abihani Express</h2><p>Premium handcrafted leather goods from Yobe State, Nigeria</p></div><div class="slider-dots"><span class="dot active"></span></div>`;
         return;
     }
+    
     const renderSlide = (index) => {
         const slide = state.sliders[index];
         container.innerHTML = `<div class="slider-card"><h2>${escapeHtml(slide.title)}</h2><p>${escapeHtml(slide.subtitle)}</p></div>
-            <div class="slider-dots">${state.sliders.map((_, i) => `<span class="dot ${i === index ? 'active' : ''}" onclick="setSlide(${i})"></span>`).join('')}</div>`;
+            <div class="slider-dots">${state.sliders.map((_, i) => `<span class="dot ${i === index ? 'active' : ''}" onclick="window.setSlide(${i})"></span>`).join('')}</div>`;
     };
     renderSlide(0);
+    
     if (state.autoSlideInterval) clearInterval(state.autoSlideInterval);
     if (state.sliders.length > 1) {
         state.autoSlideInterval = setInterval(() => {
@@ -342,8 +399,11 @@ function renderCategoriesHome() {
     const container = document.getElementById('categories-home');
     if (!container) return;
     const cats = state.allCategories || [];
-    if (!cats.length) { container.innerHTML = '<div class="category-pill">Loading...</div>'; return; }
-    container.innerHTML = cats.map(cat => `<div class="category-pill" onclick="filterByCategoryAndGoToShop(${cat.id})"><span style="font-size:18px; margin-right:6px;">${cat.icon || '📦'}</span> ${cat.name}</div>`).join('');
+    if (!cats.length) { 
+        container.innerHTML = '<div class="category-pill">Loading...</div>'; 
+        return; 
+    }
+    container.innerHTML = cats.map(cat => `<div class="category-pill" onclick="window.filterByCategoryAndGoToShop(${cat.id})"><span style="font-size:18px; margin-right:6px;">${cat.icon || '📦'}</span> ${cat.name}</div>`).join('');
 }
 
 function filterByCategoryAndGoToShop(categoryId) {
@@ -356,20 +416,21 @@ function renderCategoriesFilter() {
     const container = document.getElementById('categories-filter');
     if (!container) return;
     const cats = state.allCategories || [];
-    container.innerHTML = `<div class="category-pill active" onclick="filterAllProducts()">All</div>` +
-        cats.map(cat => `<div class="category-pill" onclick="filterByCategory(${cat.id})"><span style="font-size:14px; margin-right:6px;">${cat.icon || '📦'}</span> ${cat.name}</div>`).join('');
+    container.innerHTML = `<div class="category-pill active" onclick="window.filterAllProducts()">All</div>` +
+        cats.map(cat => `<div class="category-pill" onclick="window.filterByCategory(${cat.id})"><span style="font-size:14px; margin-right:6px;">${cat.icon || '📦'}</span> ${cat.name}</div>`).join('');
 }
 
 function filterByCategory(categoryId) {
     loadAllProducts(categoryId);
     document.querySelectorAll('#categories-filter .category-pill').forEach(p => p.classList.remove('active'));
-    event.target.classList.add('active');
+    if (event && event.target) event.target.classList.add('active');
 }
 
 function filterAllProducts() {
     loadAllProducts();
     document.querySelectorAll('#categories-filter .category-pill').forEach(p => p.classList.remove('active'));
-    document.querySelector('#categories-filter .category-pill:first-child')?.classList.add('active');
+    const firstPill = document.querySelector('#categories-filter .category-pill:first-child');
+    if (firstPill) firstPill.classList.add('active');
 }
 
 function renderFeaturedProducts(products) {
@@ -493,7 +554,7 @@ function renderArtisanSection() {
                 <span class="artisan-badge">✨ Meet Our Master Artisan ✨</span>
                 <h3>${escapeHtml(artisanName)}</h3>
                 <p>${escapeHtml(artisanStory)}</p>
-                <button class="btn-secondary" onclick="openArtisanPopup()">Learn More →</button>
+                <button class="btn-secondary" onclick="window.openArtisanPopup()">Learn More →</button>
             </div>
         </div>
     `;
@@ -509,7 +570,7 @@ function renderArtisanPopup() {
     container.innerHTML = `
         <div id="artisan-popup" class="artisan-popup-overlay">
             <div class="artisan-popup-content">
-                <span class="artisan-popup-close" onclick="closeArtisanPopup()">&times;</span>
+                <span class="artisan-popup-close" onclick="window.closeArtisanPopup()">&times;</span>
                 <div class="artisan-popup-body">
                     <div class="artisan-popup-image"><img src="${artisanImageUrl}" alt="${escapeHtml(artisanName)}"></div>
                     <div class="artisan-popup-info">
@@ -534,31 +595,31 @@ function closeArtisanPopup() {
     if (popup) { popup.style.display = 'none'; document.body.style.overflow = 'auto'; }
 }
 
+let bookData = [];
+
 function renderBooksSection() {
     const container = document.getElementById('books-container');
     if (!container) return;
     const s = state.siteSettings || {};
-    const books = [
+    bookData = [
         { title: s.book1_title || 'My Gifts to Dear Students', author: s.book1_author || 'Abihani Isa', price: s.book1_price || 'FREE', cover: s.book1_cover_url || 'https://placehold.co/400x600/e6d5c0/8b5a2b?text=Book1', isFree: s.book1_is_free !== false, pdfUrl: s.book1_pdf_url || '' },
         { title: s.book2_title || 'The Symphony of Two Hearts', author: s.book2_author || 'Abihani Isa', price: s.book2_price || '₦1,500', cover: s.book2_cover_url || 'https://placehold.co/400x600/e6d5c0/8b5a2b?text=Book2', isFree: s.book2_is_free || false, pdfUrl: s.book2_pdf_url || '', waMessage: s.book2_whatsapp_message || 'Hello Abihani Express, I want to purchase "The Symphony of Two Hearts" for ₦1,500.' }
     ];
-    container.innerHTML = books.map((book, idx) => `
-        <div class="book-card" onclick="openBookPopup(${idx})">
+    container.innerHTML = bookData.map((book, idx) => `
+        <div class="book-card" onclick="window.openBookPopup(${idx})">
             <div class="book-image"><img src="${book.cover}" alt="${escapeHtml(book.title)}"></div>
             <div class="book-info">
                 <h4>${escapeHtml(book.title)}</h4>
                 <p class="book-author">by ${escapeHtml(book.author)}</p>
                 <p class="book-price">${escapeHtml(book.price)}</p>
-                ${book.isFree ? `<a href="${book.pdfUrl || '#'}" class="btn-book-download" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-download"></i> Download PDF</a>` : `<button class="btn-book-buy" onclick="event.stopPropagation(); openBookPopup(${idx})"><i class="fab fa-whatsapp"></i> Preview & Buy</button>`}
+                ${book.isFree ? `<a href="${book.pdfUrl || '#'}" class="btn-book-download" target="_blank" onclick="event.stopPropagation()"><i class="fas fa-download"></i> Download PDF</a>` : `<button class="btn-book-buy" onclick="event.stopPropagation(); window.openBookPopup(${idx})"><i class="fab fa-whatsapp"></i> Preview & Buy</button>`}
             </div>
         </div>
     `).join('');
-    
-    window.bookData = books;
 }
 
 function openBookPopup(bookIndex) {
-    const book = window.bookData?.[bookIndex];
+    const book = bookData[bookIndex];
     if (!book) return;
     const popup = document.getElementById('book-popup');
     const img = document.getElementById('book-popup-img');
@@ -592,10 +653,10 @@ function renderCustomOrderForm() {
     const subtitle = s.custom_order_subtitle || 'Fill this form and we will WhatsApp you within minutes to confirm.';
     container.innerHTML = `
         <div class="custom-order-content">
-            <span class="custom-order-close" onclick="closeCustomOrderPopup()">&times;</span>
+            <span class="custom-order-close" onclick="window.closeCustomOrderPopup()">&times;</span>
             <h3><i class="fas fa-pen-alt"></i> ${escapeHtml(title)}</h3>
             <p>${escapeHtml(subtitle)}</p>
-            <form id="custom-order-form" onsubmit="event.preventDefault(); submitCustomOrder()">
+            <form id="custom-order-form" onsubmit="event.preventDefault(); window.submitCustomOrder()">
                 <div class="form-group"><label>Your Name *</label><input type="text" id="order-name" required></div>
                 <div class="form-group"><label>Phone Number</label><input type="tel" id="order-phone"></div>
                 <div class="form-group"><label>Product Type *</label><input type="text" id="order-product_type" required></div>
@@ -720,16 +781,20 @@ async function logoutAdmin() {
 
 async function renderAdminPanels() {
     const cats = await supabase.from('categories').select('*').order('order');
-    document.getElementById('admin-categories-list').innerHTML = cats.data?.map(c => `<div class="admin-item"><span>${c.icon || '📦'} ${escapeHtml(c.name)}</span><span class="admin-actions"><i class="fas fa-edit" onclick="editCategory(${c.id})"></i><i class="fas fa-trash" onclick="deleteCategory(${c.id})"></i></span></div>`).join('') || '<p>No categories</p>';
+    const catList = document.getElementById('admin-categories-list');
+    if (catList) catList.innerHTML = cats.data?.map(c => `<div class="admin-item"><span>${c.icon || '📦'} ${escapeHtml(c.name)}</span><span class="admin-actions"><i class="fas fa-edit" onclick="window.editCategory(${c.id})"></i><i class="fas fa-trash" onclick="window.deleteCategory(${c.id})"></i></span></div>`).join('') || '<p>No categories</p>';
     
     const subs = await supabase.from('subcategories').select('*, categories(name)');
-    document.getElementById('admin-subcategories-list').innerHTML = subs.data?.map(s => `<div class="admin-item"><span>${escapeHtml(s.name)} (${s.categories?.name || 'Unknown'})</span><span class="admin-actions"><i class="fas fa-edit" onclick="editSubcategory(${s.id})"></i><i class="fas fa-trash" onclick="deleteSubcategory(${s.id})"></i></span></div>`).join('') || '<p>No subcategories</p>';
+    const subList = document.getElementById('admin-subcategories-list');
+    if (subList) subList.innerHTML = subs.data?.map(s => `<div class="admin-item"><span>${escapeHtml(s.name)} (${s.categories?.name || 'Unknown'})</span><span class="admin-actions"><i class="fas fa-edit" onclick="window.editSubcategory(${s.id})"></i><i class="fas fa-trash" onclick="window.deleteSubcategory(${s.id})"></i></span></div>`).join('') || '<p>No subcategories</p>';
     
     const prods = await supabase.from('products').select('*, categories(name)').order('id');
-    document.getElementById('admin-products-list').innerHTML = prods.data?.map(p => `<div class="admin-item"><span>${p.image_icon || '📦'} ${escapeHtml(p.name)} - ₦${p.price}</span><span class="admin-actions"><i class="fas fa-star${p.featured ? ' text-warning' : ''}" onclick="toggleFeatured(${p.id})" style="color:${p.featured ? '#FFD700' : 'var(--text-muted)'}"></i><i class="fas fa-edit" onclick="editProduct(${p.id})"></i><i class="fas fa-trash" onclick="deleteProduct(${p.id})"></i></span></div>`).join('') || '<p>No products</p>';
+    const prodList = document.getElementById('admin-products-list');
+    if (prodList) prodList.innerHTML = prods.data?.map(p => `<div class="admin-item"><span>${p.image_icon || '📦'} ${escapeHtml(p.name)} - ₦${p.price}</span><span class="admin-actions"><i class="fas fa-star${p.featured ? ' text-warning' : ''}" onclick="window.toggleFeatured(${p.id})" style="color:${p.featured ? '#FFD700' : 'var(--text-muted)'}; cursor:pointer;"></i><i class="fas fa-edit" onclick="window.editProduct(${p.id})"></i><i class="fas fa-trash" onclick="window.deleteProduct(${p.id})"></i></span></div>`).join('') || '<p>No products</p>';
     
     const fb = await supabase.from('feedback').select('*').order('created_at', { ascending: false });
-    document.getElementById('admin-feedback-list').innerHTML = fb.data?.map(f => `<div class="admin-item" style="flex-direction:column; align-items:flex-start;"><div style="width:100%; display:flex; justify-content:space-between;"><strong>${escapeHtml(f.name || 'Anonymous')}</strong><span><i class="fas fa-trash" onclick="deleteFeedback(${f.id})" style="color:red; cursor:pointer;"></i></span></div><small>${escapeHtml(f.email)} | ${new Date(f.created_at).toLocaleString()}</small><p>${escapeHtml(f.message)}</p></div>`).join('') || '<p>No feedback</p>';
+    const fbList = document.getElementById('admin-feedback-list');
+    if (fbList) fbList.innerHTML = fb.data?.map(f => `<div class="admin-item" style="flex-direction:column; align-items:flex-start;"><div style="width:100%; display:flex; justify-content:space-between;"><strong>${escapeHtml(f.name || 'Anonymous')}</strong><span><i class="fas fa-trash" onclick="window.deleteFeedback(${f.id})" style="color:red; cursor:pointer;"></i></span></div><small>${escapeHtml(f.email)} | ${new Date(f.created_at).toLocaleString()}</small><p>${escapeHtml(f.message)}</p></div>`).join('') || '<p>No feedback</p>';
 }
 
 async function toggleFeatured(productId) {
@@ -808,8 +873,8 @@ async function editSiteSettings() {
                 <label>Form Subtitle</label><input type="text" id="edit-custom-subtitle" class="admin-input" value="${escapeHtml(s.custom_order_subtitle || '')}">
             </div>
             <div class="modal-actions" style="margin-top:20px;">
-                <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn-primary" onclick="saveSiteSettings()">Save All Changes</button>
+                <button class="btn-secondary" onclick="window.closeModal()">Cancel</button>
+                <button class="btn-primary" onclick="window.saveSiteSettings()">Save All Changes</button>
             </div>
         </div>
     `;
@@ -873,7 +938,7 @@ function closeModal() {
 
 // Category CRUD
 async function showAddCategory() {
-    openModal(`<h3>Add Category</h3><label>Name</label><input type="text" id="cat-name" class="admin-input"><label>Emoji/Icon</label><input type="text" id="cat-icon" class="admin-input" placeholder="👞"><label>Order</label><input type="number" id="cat-order" class="admin-input" value="0"><div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveCategory()">Save</button></div>`);
+    openModal(`<h3>Add Category</h3><label>Name</label><input type="text" id="cat-name" class="admin-input"><label>Emoji/Icon</label><input type="text" id="cat-icon" class="admin-input" placeholder="👞"><label>Order</label><input type="number" id="cat-order" class="admin-input" value="0"><div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.saveCategory()">Save</button></div>`);
 }
 async function saveCategory() {
     const name = document.getElementById('cat-name')?.value.trim();
@@ -886,7 +951,7 @@ async function saveCategory() {
 }
 async function editCategory(id) {
     const { data } = await supabase.from('categories').select('*').eq('id', id).single();
-    openModal(`<h3>Edit Category</h3><label>Name</label><input type="text" id="cat-name" class="admin-input" value="${escapeHtml(data?.name || '')}"><label>Emoji</label><input type="text" id="cat-icon" class="admin-input" value="${data?.icon || '📦'}"><label>Order</label><input type="number" id="cat-order" class="admin-input" value="${data?.order || 0}"><div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="updateCategory(${id})">Update</button></div>`);
+    openModal(`<h3>Edit Category</h3><label>Name</label><input type="text" id="cat-name" class="admin-input" value="${escapeHtml(data?.name || '')}"><label>Emoji</label><input type="text" id="cat-icon" class="admin-input" value="${data?.icon || '📦'}"><label>Order</label><input type="number" id="cat-order" class="admin-input" value="${data?.order || 0}"><div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.updateCategory(${id})">Update</button></div>`);
 }
 async function updateCategory(id) {
     const name = document.getElementById('cat-name')?.value.trim();
@@ -907,7 +972,7 @@ async function deleteCategory(id) {
 
 async function showAddSubcategory() {
     const { data: cats } = await supabase.from('categories').select('*');
-    openModal(`<h3>Add Subcategory</h3><label>Parent Category</label><select id="sub-cat" class="admin-input">${cats?.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}</select><label>Name</label><input type="text" id="sub-name" class="admin-input"><div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveSubcategory()">Save</button></div>`);
+    openModal(`<h3>Add Subcategory</h3><label>Parent Category</label><select id="sub-cat" class="admin-input">${cats?.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}</select><label>Name</label><input type="text" id="sub-name" class="admin-input"><div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.saveSubcategory()">Save</button></div>`);
 }
 async function saveSubcategory() {
     const name = document.getElementById('sub-name')?.value.trim();
@@ -921,7 +986,7 @@ async function saveSubcategory() {
 async function editSubcategory(id) {
     const { data } = await supabase.from('subcategories').select('*').eq('id', id).single();
     const { data: cats } = await supabase.from('categories').select('*');
-    openModal(`<h3>Edit Subcategory</h3><label>Parent Category</label><select id="sub-cat" class="admin-input">${cats?.map(c => `<option value="${c.id}" ${c.id === data?.category_id ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}</select><label>Name</label><input type="text" id="sub-name" class="admin-input" value="${escapeHtml(data?.name || '')}"><div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="updateSubcategory(${id})">Update</button></div>`);
+    openModal(`<h3>Edit Subcategory</h3><label>Parent Category</label><select id="sub-cat" class="admin-input">${cats?.map(c => `<option value="${c.id}" ${c.id === data?.category_id ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}</select><label>Name</label><input type="text" id="sub-name" class="admin-input" value="${escapeHtml(data?.name || '')}"><div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.updateSubcategory(${id})">Update</button></div>`);
 }
 async function updateSubcategory(id) {
     const name = document.getElementById('sub-name')?.value.trim();
@@ -942,14 +1007,14 @@ async function deleteSubcategory(id) {
 
 async function showAddProduct() {
     const { data: cats } = await supabase.from('categories').select('*');
-    openModal(`<h3>Add Product</h3><label>Name</label><input type="text" id="prod-name" class="admin-input"><label>Price (₦)</label><input type="number" id="prod-price" class="admin-input"><label>Category</label><select id="prod-cat" class="admin-input" onchange="updateSubcatOptions()">${cats?.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}</select><label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select><label>Emoji Icon</label><input type="text" id="prod-icon" class="admin-input" value="📦"><label>Image URL</label><input type="url" id="prod-image" class="admin-input"><label>Description</label><textarea id="prod-desc" class="admin-input" rows="3"></textarea><label><input type="checkbox" id="prod-featured"> Featured</label><div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveProduct()">Save</button></div>`);
+    openModal(`<h3>Add Product</h3><label>Name</label><input type="text" id="prod-name" class="admin-input"><label>Price (₦)</label><input type="number" id="prod-price" class="admin-input"><label>Category</label><select id="prod-cat" class="admin-input" onchange="window.updateSubcatOptions()">${cats?.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}</select><label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select><label>Emoji Icon</label><input type="text" id="prod-icon" class="admin-input" value="📦"><label>Image URL</label><input type="url" id="prod-image" class="admin-input"><label>Description</label><textarea id="prod-desc" class="admin-input" rows="3"></textarea><label><input type="checkbox" id="prod-featured"> Featured</label><div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.saveProduct()">Save</button></div>`);
     window.updateSubcatOptions = async function() {
         const catId = document.getElementById('prod-cat')?.value;
         const { data: subs } = await supabase.from('subcategories').select('*').eq('category_id', catId);
         const subSelect = document.getElementById('prod-sub');
         if (subSelect) subSelect.innerHTML = '<option value="">None</option>' + (subs?.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('') || '');
     };
-    setTimeout(() => updateSubcatOptions(), 100);
+    setTimeout(() => { if (window.updateSubcatOptions) window.updateSubcatOptions(); }, 100);
 }
 async function saveProduct() {
     const name = document.getElementById('prod-name')?.value.trim();
@@ -972,7 +1037,7 @@ async function saveProduct() {
 async function editProduct(id) {
     const { data } = await supabase.from('products').select('*').eq('id', id).single();
     const { data: cats } = await supabase.from('categories').select('*');
-    openModal(`<h3>Edit Product</h3><label>Name</label><input type="text" id="prod-name" class="admin-input" value="${escapeHtml(data?.name || '')}"><label>Price</label><input type="number" id="prod-price" class="admin-input" value="${data?.price || 0}"><label>Category</label><select id="prod-cat" class="admin-input">${cats?.map(c => `<option value="${c.id}" ${c.id === data?.category_id ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}</select><label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select><label>Emoji</label><input type="text" id="prod-icon" class="admin-input" value="${data?.image_icon || '📦'}"><label>Image URL</label><input type="url" id="prod-image" class="admin-input" value="${data?.image_url || ''}"><label>Description</label><textarea id="prod-desc" class="admin-input" rows="3">${escapeHtml(data?.description || '')}</textarea><label><input type="checkbox" id="prod-featured" ${data?.featured ? 'checked' : ''}> Featured</label><div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="updateProduct(${id})">Update</button></div>`);
+    openModal(`<h3>Edit Product</h3><label>Name</label><input type="text" id="prod-name" class="admin-input" value="${escapeHtml(data?.name || '')}"><label>Price</label><input type="number" id="prod-price" class="admin-input" value="${data?.price || 0}"><label>Category</label><select id="prod-cat" class="admin-input">${cats?.map(c => `<option value="${c.id}" ${c.id === data?.category_id ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}</select><label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select><label>Emoji</label><input type="text" id="prod-icon" class="admin-input" value="${data?.image_icon || '📦'}"><label>Image URL</label><input type="url" id="prod-image" class="admin-input" value="${data?.image_url || ''}"><label>Description</label><textarea id="prod-desc" class="admin-input" rows="3">${escapeHtml(data?.description || '')}</textarea><label><input type="checkbox" id="prod-featured" ${data?.featured ? 'checked' : ''}> Featured</label><div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.updateProduct(${id})">Update</button></div>`);
     const subs = await supabase.from('subcategories').select('*').eq('category_id', data?.category_id);
     const subSelect = document.getElementById('prod-sub');
     if (subSelect) subSelect.innerHTML = '<option value="">None</option>' + (subs.data?.map(s => `<option value="${s.id}" ${s.id === data?.subcategory_id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('') || '');
@@ -1019,25 +1084,43 @@ function shareToWhatsAppStatus(productId) {
 // INITIALIZATION
 // ============================================
 
+// Setup click handlers for data-page elements
 document.addEventListener('click', (e) => {
+    // Close modals when clicking overlay
     if (e.target === document.getElementById('admin-modal')) closeModal();
     if (e.target === document.getElementById('custom-order-popup')) closeCustomOrderPopup();
     if (e.target === document.getElementById('book-popup')) closeBookPopup();
     if (e.target === document.getElementById('artisan-popup')) closeArtisanPopup();
     
+    // Handle data-page clicks
     const pageLink = e.target.closest('[data-page]');
     if (pageLink) {
         e.preventDefault();
         const page = pageLink.getAttribute('data-page');
         const scroll = pageLink.getAttribute('data-scroll') === 'books';
-        if (page === 'about' && scroll) scrollToBooks();
-        else if (page) showPage(page);
+        if (page === 'about' && scroll) {
+            scrollToBooks();
+        } else if (page) {
+            showPage(page);
+        }
     }
 });
 
-document.getElementById('search-input')?.addEventListener('keyup', searchProducts);
+// Setup search input
+const searchInput = document.getElementById('search-input');
+if (searchInput) {
+    searchInput.addEventListener('keyup', searchProducts);
+}
 
+// Setup menu toggle
+const menuToggle = document.getElementById('menu-toggle');
+if (menuToggle) {
+    menuToggle.addEventListener('click', toggleMobileMenu);
+}
+
+// Initialize on load
 window.addEventListener('load', async () => {
+    console.log('App loading...');
     await loadSiteSettings();
     await loadCategories();
     await loadSubcategories();
@@ -1046,10 +1129,17 @@ window.addEventListener('load', async () => {
     handleHashChange();
     
     const savedFilter = sessionStorage.getItem('filterCategory');
-    if (savedFilter) { sessionStorage.removeItem('filterCategory'); filterByCategory(parseInt(savedFilter)); }
+    if (savedFilter) { 
+        sessionStorage.removeItem('filterCategory'); 
+        filterByCategory(parseInt(savedFilter)); 
+    }
+    console.log('App loaded successfully!');
 });
 
-// Expose globals
+// ============================================
+// EXPOSE ALL FUNCTIONS TO GLOBAL SCOPE
+// ============================================
+
 window.showPage = showPage;
 window.toggleTheme = toggleTheme;
 window.showProductDetail = showProductDetail;
@@ -1057,6 +1147,7 @@ window.buyNow = buyNow;
 window.setSlide = setSlide;
 window.filterByCategory = filterByCategory;
 window.filterAllProducts = filterAllProducts;
+window.filterByCategoryAndGoToShop = filterByCategoryAndGoToShop;
 window.searchProducts = searchProducts;
 window.submitFeedback = submitFeedback;
 window.adminLogin = adminLogin;
@@ -1065,14 +1156,17 @@ window.editSiteSettings = editSiteSettings;
 window.saveSiteSettings = saveSiteSettings;
 window.closeModal = closeModal;
 window.showAddCategory = showAddCategory;
+window.saveCategory = saveCategory;
 window.editCategory = editCategory;
 window.updateCategory = updateCategory;
 window.deleteCategory = deleteCategory;
 window.showAddSubcategory = showAddSubcategory;
+window.saveSubcategory = saveSubcategory;
 window.editSubcategory = editSubcategory;
 window.updateSubcategory = updateSubcategory;
 window.deleteSubcategory = deleteSubcategory;
 window.showAddProduct = showAddProduct;
+window.saveProduct = saveProduct;
 window.editProduct = editProduct;
 window.updateProduct = updateProduct;
 window.deleteProduct = deleteProduct;
@@ -1089,5 +1183,6 @@ window.scrollToBooks = scrollToBooks;
 window.toggleMobileMenu = toggleMobileMenu;
 window.closeMobileMenu = closeMobileMenu;
 window.closeAnnouncement = closeAnnouncement;
+window.deleteFeedback = deleteFeedback;
 
-console.log('Abihani Express loaded successfully!');
+console.log('All functions exposed to window object');
