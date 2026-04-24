@@ -1,6 +1,7 @@
 // ============================================
-// ABIHANI EXPRESS - COMPLETE APPLICATION
-// All 17 Upgrades + All Features
+// ABIHANI EXPRESS - COMPLETE CORRECTED APP
+// All features aligned with SQL structure
+// NO JSON for sliders/badges - uses separate columns
 // ============================================
 
 // ---------- SUPABASE INITIALIZATION ----------
@@ -15,6 +16,7 @@ const state = {
     isAdminLoggedIn: false,
     currentUser: null,
     currentSlide: 0,
+    // These will be populated from separate columns
     sliders: [],
     trustBadges: [],
     sustainabilityBadges: [],
@@ -108,6 +110,7 @@ function showPage(pageName, scrollToBooksFlag = false, productId = null) {
         'terms': () => document.getElementById('terms-page').classList.add('active-page'),
         'privacy': () => document.getElementById('privacy-page').classList.add('active-page'),
         'contact': () => document.getElementById('contact-page').classList.add('active-page'),
+        'blog': () => { document.getElementById('blog-page').classList.add('active-page'); loadBlogPosts(); },
         'profile': () => {
             if (state.isAdminLoggedIn) showPage('admin-dashboard');
             else document.getElementById('profile-page').classList.add('active-page');
@@ -117,14 +120,14 @@ function showPage(pageName, scrollToBooksFlag = false, productId = null) {
     if (pageMap[pageName]) pageMap[pageName]();
     
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    const navMap = { 'home': 'nav-home', 'shop': 'nav-shop', 'search': 'nav-search', 'profile': 'nav-profile', 'admin-login': 'nav-profile', 'admin-dashboard': 'nav-profile' };
+    const navMap = { 'home': 'nav-home', 'shop': 'nav-shop', 'search': 'nav-search', 'profile': 'nav-profile', 'admin-login': 'nav-profile', 'admin-dashboard': 'nav-profile', 'blog': 'nav-blog' };
     if (navMap[pageName]) document.getElementById(navMap[pageName])?.classList.add('active');
 }
 
 function handleHashChange() {
     if (isUpdatingHash) return;
     let hash = window.location.hash.slice(1).split('?')[0];
-    const validPages = ['home', 'shop', 'search', 'about', 'contact', 'profile', 'admin-login', 'product-detail', 'terms', 'privacy'];
+    const validPages = ['home', 'shop', 'search', 'about', 'contact', 'profile', 'admin-login', 'product-detail', 'terms', 'privacy', 'blog'];
     if (hash && validPages.includes(hash)) {
         isUpdatingHash = true;
         showPage(hash);
@@ -212,9 +215,14 @@ function openWASummary(productId) {
     state.currentProductForWA = product;
     const finalPrice = product.discount_percent ? product.price * (1 - product.discount_percent / 100) : product.price;
     
-    const overlay = document.createElement('div');
-    overlay.className = 'wa-summary-overlay';
-    overlay.id = 'wa-summary-overlay';
+    let overlay = document.getElementById('wa-summary-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'wa-summary-overlay';
+        overlay.className = 'wa-summary-overlay';
+        document.body.appendChild(overlay);
+    }
+    
     overlay.innerHTML = `
         <div class="wa-summary-content">
             <h3>📝 Confirm Order</h3>
@@ -227,7 +235,6 @@ function openWASummary(productId) {
             </div>
         </div>
     `;
-    document.body.appendChild(overlay);
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
@@ -235,7 +242,7 @@ function openWASummary(productId) {
 function closeWASummary() {
     const overlay = document.getElementById('wa-summary-overlay');
     if (overlay) {
-        overlay.remove();
+        overlay.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
 }
@@ -254,7 +261,7 @@ function confirmAndSendWA() {
 }
 
 // ============================================
-// PRODUCT DETAILS - Upgrade #15
+// PRODUCT DETAILS - Upgrade #15 & Suggestion #8
 // ============================================
 
 async function showProductDetail(productId) {
@@ -293,6 +300,8 @@ async function showProductDetail(productId) {
         .limit(4);
     
     const container = document.getElementById('product-detail-container');
+    if (!container) return;
+    
     container.innerHTML = `
         <div class="product-detail-container">
             <div class="product-detail-images">
@@ -335,8 +344,6 @@ async function showProductDetail(productId) {
 // ============================================
 
 let searchDebounceTimer = null;
-let currentFilter = 'all';
-let currentSort = 'default';
 let currentPriceMax = 100000;
 
 async function searchProducts() {
@@ -354,30 +361,28 @@ async function searchProducts() {
 }
 
 function renderFilterUI() {
-    const filterContainer = document.getElementById('products-page');
-    const existingFilter = document.querySelector('.filter-bar');
+    const existingFilter = document.querySelector('#shop-page .filter-bar');
     if (existingFilter) existingFilter.remove();
     
     const filterBar = document.createElement('div');
     filterBar.className = 'filter-bar';
-    filterBar.style.cssText = 'display:flex; gap:12px; flex-wrap:wrap; margin:20px 0; padding:16px; background:var(--bg-secondary); border-radius:20px;';
     filterBar.innerHTML = `
-        <select id="filter-category" class="admin-input" style="width:auto; margin:0;">
+        <select id="filter-category" style="flex:1; padding:10px 16px; border-radius:40px; border:1px solid var(--border); background:var(--bg-primary); color:var(--text-primary);">
             <option value="all">All Categories</option>
             ${state.allCategories.map(c => `<option value="${c.id}">${c.icon || '📦'} ${escapeHtml(c.name)}</option>`).join('')}
         </select>
-        <select id="filter-sort" class="admin-input" style="width:auto; margin:0;">
+        <select id="filter-sort" style="flex:1; padding:10px 16px; border-radius:40px; border:1px solid var(--border); background:var(--bg-primary); color:var(--text-primary);">
             <option value="default">Sort by: Default</option>
             <option value="price_asc">Price: Low to High</option>
             <option value="price_desc">Price: High to Low</option>
             <option value="rating">Highest Rated</option>
         </select>
-        <div style="flex:1; min-width:150px;">
+        <div style="flex:2; min-width:150px;">
             <input type="range" id="price-range" min="0" max="200000" step="5000" value="100000" style="width:100%;">
             <span>Max Price: ₦<span id="price-value">100,000</span></span>
         </div>
     `;
-    const sectionTitle = document.querySelector('#products-page .section-title');
+    const sectionTitle = document.querySelector('#shop-page .section-title');
     if (sectionTitle) sectionTitle.after(filterBar);
     
     document.getElementById('filter-category')?.addEventListener('change', applyFilters);
@@ -408,7 +413,7 @@ async function applyFilters() {
 }
 
 // ============================================
-// DATA LOADING FUNCTIONS
+// DATA LOADING FUNCTIONS - CORRECTED to read from columns
 // ============================================
 
 async function loadSiteSettings() {
@@ -417,32 +422,47 @@ async function loadSiteSettings() {
     
     state.siteSettings = data;
     
-    // Load sliders from separate columns
+    // Load sliders from SEPARATE columns (NOT JSON)
     state.sliders = [];
     for (let i = 1; i <= 5; i++) {
-        if (data[`slider${i}_enabled`] && data[`slider${i}_title`]) {
-            state.sliders.push({ title: data[`slider${i}_title`], subtitle: data[`slider${i}_subtitle`] });
+        if (data[`slider${i}_enabled`] && data[`slider${i}_title`] && data[`slider${i}_title`].trim() !== '') {
+            state.sliders.push({ 
+                title: data[`slider${i}_title`], 
+                subtitle: data[`slider${i}_subtitle`] || '' 
+            });
         }
     }
     
-    // Load trust badges
+    // Load trust badges from SEPARATE columns
     state.trustBadges = [];
     for (let i = 1; i <= 4; i++) {
-        if (data[`trust_badge${i}_text`]) {
-            state.trustBadges.push({ icon: data[`trust_badge${i}_icon`], text: data[`trust_badge${i}_text`] });
+        const text = data[`trust_badge${i}_text`];
+        if (text && text.trim() !== '') {
+            state.trustBadges.push({ 
+                icon: data[`trust_badge${i}_icon`] || 'fa-tag', 
+                text: text 
+            });
         }
     }
     
-    // Load sustainability badges
+    // Load sustainability badges from SEPARATE columns
     state.sustainabilityBadges = [];
     for (let i = 1; i <= 3; i++) {
-        if (data[`sustain_badge${i}_text`]) {
-            state.sustainabilityBadges.push({ icon: data[`sustain_badge${i}_icon`], text: data[`sustain_badge${i}_text`] });
+        const text = data[`sustain_badge${i}_text`];
+        if (text && text.trim() !== '') {
+            state.sustainabilityBadges.push({ 
+                icon: data[`sustain_badge${i}_icon`] || 'fa-leaf', 
+                text: text 
+            });
         }
     }
     
     // Load custom order fields
-    try { state.customOrderFields = JSON.parse(data.custom_order_fields_json || '[]'); } catch(e) { state.customOrderFields = []; }
+    try { 
+        state.customOrderFields = JSON.parse(data.custom_order_fields_json || '[]'); 
+    } catch(e) { 
+        state.customOrderFields = []; 
+    }
     
     // Apply colors
     if (data.primary_color) document.documentElement.style.setProperty('--accent', data.primary_color);
@@ -470,6 +490,7 @@ async function loadSiteSettings() {
     
     if (localStorage.getItem('announcementClosed') === 'true') closeAnnouncement();
     
+    // Render all sections
     renderSlider();
     renderInfoSections();
     renderSocialLinks();
@@ -483,7 +504,6 @@ async function loadSiteSettings() {
     renderPrivacyPage();
     renderAboutPage();
     renderMissionSection();
-    renderBlogSection();
 }
 
 async function loadCategories() {
@@ -727,7 +747,7 @@ function renderArtisanPopup() {
     const s = state.siteSettings || {};
     const artisanImageUrl = s.artisan_image_url || 'https://placehold.co/400x400/e6d5c0/8b5a2b?text=Master+Artisan';
     const artisanName = s.artisan_name || 'Adamu Yahaya AYFOOTIES';
-    const artisanFullStory = s.artisan_full_story || s.artisan_story || 'Adamu Yahaya AYFOOTIES has been crafting leather goods for over 20 years. He learned the trade from his father, who learned from his grandfather. Today, he leads a team of 15 artisans at the Abihani Express workshop in Potiskum, Yobe State.';
+    const artisanFullStory = s.artisan_full_story || s.artisan_story || 'Adamu Yahaya AYFOOTIES has been crafting leather goods for over 20 years. He learned the trade from his father. Today, he leads a team of 15 artisans at the Abihani Express workshop in Potiskum, Yobe State.';
     container.innerHTML = `
         <div id="artisan-popup" class="artisan-popup-overlay">
             <div class="artisan-popup-content">
@@ -893,12 +913,6 @@ function renderAboutPage() {
     }
 }
 
-function renderBlogSection() {
-    const container = document.getElementById('blog-section');
-    if (!container) return;
-    loadBlogPosts();
-}
-
 function renderBlogPosts(posts) {
     const container = document.getElementById('blog-posts-container');
     if (!container) return;
@@ -907,10 +921,10 @@ function renderBlogPosts(posts) {
         return;
     }
     container.innerHTML = posts.map(post => `
-        <div class="blog-card" style="background:var(--bg-card); border-radius:20px; padding:20px; margin-bottom:20px; border:1px solid var(--border);">
-            <h3 style="color:var(--accent); margin-bottom:8px;">${escapeHtml(post.title)}</h3>
-            <small style="color:var(--text-muted);">${new Date(post.date).toLocaleDateString()}</small>
-            <p style="margin-top:12px; color:var(--text-secondary);">${escapeHtml(post.content)}</p>
+        <div class="blog-card">
+            <h3>${escapeHtml(post.title)}</h3>
+            <small>${new Date(post.date).toLocaleDateString()}</small>
+            <p>${escapeHtml(post.content)}</p>
         </div>
     `).join('');
 }
@@ -1058,9 +1072,9 @@ async function editSiteSettings() {
             <div class="settings-section"><h4>⚙️ Custom Order</h4>
                 <label>Form Title</label><input type="text" id="edit-custom-title" class="admin-input" value="${escapeHtml(s.custom_order_title || '')}">
                 <label>Form Subtitle</label><input type="text" id="edit-custom-subtitle" class="admin-input" value="${escapeHtml(s.custom_order_subtitle || '')}">
-                <label>Custom Fields (JSON - advanced users)</label>
+                <label>Custom Fields (JSON)</label>
                 <textarea id="edit-custom-fields" class="admin-input" rows="6">${escapeHtml(s.custom_order_fields_json || '[]')}</textarea>
-                <small>Format: [{"name":"field_name","label":"Display Label","type":"text","required":true,"placeholder":"Hint text"}]</small>
+                <small>Format: [{"name":"field_name","label":"Display Label","type":"text","required":true,"placeholder":"Hint"}]</small>
             </div>
             <div class="modal-actions" style="margin-top:20px;">
                 <button class="btn-secondary" onclick="window.closeModal()">Cancel</button>
@@ -1205,11 +1219,12 @@ async function showAddProduct() {
         <label>Price (₦)</label><input type="number" id="prod-price" class="admin-input">
         <label>Discount %</label><input type="number" id="prod-discount" class="admin-input" value="0">
         <label>Stock Quantity</label><input type="number" id="prod-stock" class="admin-input" value="10">
-        <label>Low Stock Alert (at or below)</label><input type="number" id="prod-low-stock" class="admin-input" value="5">
+        <label>Low Stock Alert</label><input type="number" id="prod-low-stock" class="admin-input" value="5">
         <label>Category</label><select id="prod-cat" class="admin-input" onchange="window.updateSubcatOptions()">${cats?.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}</select>
         <label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select>
         <label>Emoji Icon</label><input type="text" id="prod-icon" class="admin-input" value="📦">
         <label>Image URL</label><input type="url" id="prod-image" class="admin-input">
+        <label>Multiple Images (JSON URLs)</label><input type="text" id="prod-images" class="admin-input" placeholder='["url1","url2"]'>
         <label>Description</label><textarea id="prod-desc" class="admin-input" rows="3"></textarea>
         <label><input type="checkbox" id="prod-featured"> Featured</label>
         <div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.saveProduct()">Save</button></div>`);
@@ -1225,6 +1240,11 @@ async function saveProduct() {
     const name = document.getElementById('prod-name')?.value.trim();
     const price = parseInt(document.getElementById('prod-price')?.value);
     if (!name || !price) { showToast('Name and price required', 'error'); return; }
+    let imageUrls = document.getElementById('prod-images')?.value;
+    let parsedUrls = '[]';
+    if (imageUrls) {
+        try { parsedUrls = JSON.stringify(JSON.parse(imageUrls)); } catch(e) { parsedUrls = '[]'; }
+    }
     await supabase.from('products').insert([{
         name, price,
         discount_percent: parseInt(document.getElementById('prod-discount')?.value) || 0,
@@ -1234,6 +1254,7 @@ async function saveProduct() {
         subcategory_id: parseInt(document.getElementById('prod-sub')?.value) || null,
         image_icon: document.getElementById('prod-icon')?.value || '📦',
         image_url: document.getElementById('prod-image')?.value || null,
+        image_urls: parsedUrls,
         description: document.getElementById('prod-desc')?.value || '',
         featured: document.getElementById('prod-featured')?.checked || false
     }]);
@@ -1255,6 +1276,7 @@ async function editProduct(id) {
         <label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select>
         <label>Emoji</label><input type="text" id="prod-icon" class="admin-input" value="${data?.image_icon || '📦'}">
         <label>Image URL</label><input type="url" id="prod-image" class="admin-input" value="${data?.image_url || ''}">
+        <label>Multiple Images (JSON)</label><input type="text" id="prod-images" class="admin-input" value='${escapeHtml(data?.image_urls || '[]')}'>
         <label>Description</label><textarea id="prod-desc" class="admin-input" rows="3">${escapeHtml(data?.description || '')}</textarea>
         <label><input type="checkbox" id="prod-featured" ${data?.featured ? 'checked' : ''}> Featured</label>
         <div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.updateProduct(${id})">Update</button></div>`);
@@ -1266,6 +1288,11 @@ async function updateProduct(id) {
     const name = document.getElementById('prod-name')?.value.trim();
     const price = parseInt(document.getElementById('prod-price')?.value);
     if (!name || !price) return;
+    let imageUrls = document.getElementById('prod-images')?.value;
+    let parsedUrls = '[]';
+    if (imageUrls) {
+        try { parsedUrls = JSON.stringify(JSON.parse(imageUrls)); } catch(e) { parsedUrls = '[]'; }
+    }
     await supabase.from('products').update({
         name, price,
         discount_percent: parseInt(document.getElementById('prod-discount')?.value) || 0,
@@ -1275,6 +1302,7 @@ async function updateProduct(id) {
         subcategory_id: parseInt(document.getElementById('prod-sub')?.value) || null,
         image_icon: document.getElementById('prod-icon')?.value,
         image_url: document.getElementById('prod-image')?.value,
+        image_urls: parsedUrls,
         description: document.getElementById('prod-desc')?.value,
         featured: document.getElementById('prod-featured')?.checked
     }).eq('id', id);
@@ -1360,6 +1388,7 @@ document.addEventListener('click', (e) => {
     if (e.target === document.getElementById('custom-order-popup')) closeCustomOrderPopup();
     if (e.target === document.getElementById('book-popup')) closeBookPopup();
     if (e.target === document.getElementById('artisan-popup')) closeArtisanPopup();
+    if (e.target.classList.contains('wa-summary-overlay')) closeWASummary();
     
     const pageLink = e.target.closest('[data-page]');
     if (pageLink) {
@@ -1449,4 +1478,4 @@ window.closeMobileMenu = closeMobileMenu;
 window.closeAnnouncement = closeAnnouncement;
 window.deleteFeedback = deleteFeedback;
 
-console.log('✅ All functions exposed - Website ready!');
+console.log('✅ All functions exposed - Abihani Express ready!');
