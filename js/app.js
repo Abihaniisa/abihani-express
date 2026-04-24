@@ -1,7 +1,6 @@
 // ============================================
-// ABIHANI EXPRESS - COMPLETE CORRECTED APP
-// All features aligned with SQL structure
-// NO JSON for sliders/badges - uses separate columns
+// ABIHANI EXPRESS - COMPLETE APPLICATION
+// All features aligned with SQL
 // ============================================
 
 // ---------- SUPABASE INITIALIZATION ----------
@@ -16,7 +15,6 @@ const state = {
     isAdminLoggedIn: false,
     currentUser: null,
     currentSlide: 0,
-    // These will be populated from separate columns
     sliders: [],
     trustBadges: [],
     sustainabilityBadges: [],
@@ -68,14 +66,12 @@ function closeMobileMenu() {
     if (menu) menu.classList.remove('show');
 }
 
-// Back to Top Button
 function initBackToTop() {
     const btn = document.createElement('button');
     btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
     btn.className = 'back-to-top';
     btn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
     document.body.appendChild(btn);
-    
     window.addEventListener('scroll', () => {
         if (window.scrollY > 300) btn.classList.add('visible');
         else btn.classList.remove('visible');
@@ -120,7 +116,7 @@ function showPage(pageName, scrollToBooksFlag = false, productId = null) {
     if (pageMap[pageName]) pageMap[pageName]();
     
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    const navMap = { 'home': 'nav-home', 'shop': 'nav-shop', 'search': 'nav-search', 'profile': 'nav-profile', 'admin-login': 'nav-profile', 'admin-dashboard': 'nav-profile', 'blog': 'nav-blog' };
+    const navMap = { 'home': 'nav-home', 'shop': 'nav-shop', 'search': 'nav-search', 'profile': 'nav-profile' };
     if (navMap[pageName]) document.getElementById(navMap[pageName])?.classList.add('active');
 }
 
@@ -146,7 +142,7 @@ function scrollToBooks() {
 }
 
 // ============================================
-// STAR RATING GENERATOR - Upgrade #3
+// STAR RATING GENERATOR
 // ============================================
 
 function generateStarRating(rating) {
@@ -204,7 +200,7 @@ function productCardHTML(p) {
 }
 
 // ============================================
-// WHATSAPP ORDER SUMMARY - Suggestion #1
+// WHATSAPP ORDER SUMMARY
 // ============================================
 
 function openWASummary(productId) {
@@ -261,7 +257,7 @@ function confirmAndSendWA() {
 }
 
 // ============================================
-// PRODUCT DETAILS - Upgrade #15 & Suggestion #8
+// PRODUCT DETAILS
 // ============================================
 
 async function showProductDetail(productId) {
@@ -282,7 +278,6 @@ async function showProductDetail(productId) {
     else if (product.stock_quantity <= product.low_stock_alert) stockHtml = `<span class="stock-low">⚠️ Only ${product.stock_quantity} left in stock!</span>`;
     else stockHtml = `<span class="stock-in-stock">✅ In Stock (${product.stock_quantity} available)</span>`;
     
-    // Parse multiple images
     let images = [];
     try { images = JSON.parse(product.image_urls || '[]'); } catch(e) { images = []; }
     if (product.image_url && !images.includes(product.image_url)) images.unshift(product.image_url);
@@ -291,7 +286,6 @@ async function showProductDetail(productId) {
     const mainImage = images[0] ? `<img src="${escapeHtml(images[0])}" alt="${escapeHtml(product.name)}" id="detail-main-image">` : `<div style="font-size:80px;">${product.image_icon || '📦'}</div>`;
     const thumbnails = images.slice(1).map(img => img ? `<img src="${escapeHtml(img)}" onclick="document.getElementById('detail-main-image').src='${escapeHtml(img)}'">` : '').join('');
     
-    // Load related products
     const { data: related } = await supabase
         .from('products')
         .select('*')
@@ -340,7 +334,7 @@ async function showProductDetail(productId) {
 }
 
 // ============================================
-// SEARCH & FILTERS - Suggestion #3
+// SEARCH & FILTERS
 // ============================================
 
 let searchDebounceTimer = null;
@@ -413,7 +407,7 @@ async function applyFilters() {
 }
 
 // ============================================
-// DATA LOADING FUNCTIONS - CORRECTED to read from columns
+// DATA LOADING FUNCTIONS
 // ============================================
 
 async function loadSiteSettings() {
@@ -422,47 +416,34 @@ async function loadSiteSettings() {
     
     state.siteSettings = data;
     
-    // Load sliders from SEPARATE columns (NOT JSON)
+    // Load sliders from separate columns
     state.sliders = [];
     for (let i = 1; i <= 5; i++) {
         if (data[`slider${i}_enabled`] && data[`slider${i}_title`] && data[`slider${i}_title`].trim() !== '') {
-            state.sliders.push({ 
-                title: data[`slider${i}_title`], 
-                subtitle: data[`slider${i}_subtitle`] || '' 
-            });
+            state.sliders.push({ title: data[`slider${i}_title`], subtitle: data[`slider${i}_subtitle`] || '' });
         }
     }
     
-    // Load trust badges from SEPARATE columns
+    // Load trust badges from separate columns
     state.trustBadges = [];
     for (let i = 1; i <= 4; i++) {
         const text = data[`trust_badge${i}_text`];
         if (text && text.trim() !== '') {
-            state.trustBadges.push({ 
-                icon: data[`trust_badge${i}_icon`] || 'fa-tag', 
-                text: text 
-            });
+            state.trustBadges.push({ icon: data[`trust_badge${i}_icon`] || 'fa-tag', text: text });
         }
     }
     
-    // Load sustainability badges from SEPARATE columns
+    // Load sustainability badges from separate columns
     state.sustainabilityBadges = [];
     for (let i = 1; i <= 3; i++) {
         const text = data[`sustain_badge${i}_text`];
         if (text && text.trim() !== '') {
-            state.sustainabilityBadges.push({ 
-                icon: data[`sustain_badge${i}_icon`] || 'fa-leaf', 
-                text: text 
-            });
+            state.sustainabilityBadges.push({ icon: data[`sustain_badge${i}_icon`] || 'fa-leaf', text: text });
         }
     }
     
     // Load custom order fields
-    try { 
-        state.customOrderFields = JSON.parse(data.custom_order_fields_json || '[]'); 
-    } catch(e) { 
-        state.customOrderFields = []; 
-    }
+    try { state.customOrderFields = JSON.parse(data.custom_order_fields_json || '[]'); } catch(e) { state.customOrderFields = []; }
     
     // Apply colors
     if (data.primary_color) document.documentElement.style.setProperty('--accent', data.primary_color);
@@ -490,7 +471,6 @@ async function loadSiteSettings() {
     
     if (localStorage.getItem('announcementClosed') === 'true') closeAnnouncement();
     
-    // Render all sections
     renderSlider();
     renderInfoSections();
     renderSocialLinks();
@@ -1388,7 +1368,7 @@ document.addEventListener('click', (e) => {
     if (e.target === document.getElementById('custom-order-popup')) closeCustomOrderPopup();
     if (e.target === document.getElementById('book-popup')) closeBookPopup();
     if (e.target === document.getElementById('artisan-popup')) closeArtisanPopup();
-    if (e.target.classList.contains('wa-summary-overlay')) closeWASummary();
+    if (e.target.classList?.contains('wa-summary-overlay')) closeWASummary();
     
     const pageLink = e.target.closest('[data-page]');
     if (pageLink) {
