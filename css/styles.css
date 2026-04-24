@@ -1,9 +1,8 @@
 /* ============================================
    ABIHANI EXPRESS - COMPLETE STYLES
-   Contains all 17 upgrades + new features
+   All 17 upgrades + all new features
    ============================================ */
 
-/* ----- RESET & VARIABLES ----- */
 * {
     margin: 0;
     padding: 0;
@@ -61,7 +60,6 @@ body {
     flex-direction: column;
 }
 
-/* Leather Texture Background - Upgrade #1 */
 body::before {
     content: '';
     position: fixed;
@@ -85,7 +83,6 @@ main {
     padding-bottom: 80px;
 }
 
-/* ----- HEADER ----- */
 .app-header {
     padding: 20px 0;
     background: var(--bg-primary);
@@ -152,7 +149,6 @@ main {
     color: var(--accent);
 }
 
-/* ----- ANNOUNCEMENT BAR - Upgrade #10 & #12 ----- */
 .announcement-bar {
     background: linear-gradient(135deg, var(--accent), #9b5e36);
     color: white;
@@ -173,18 +169,12 @@ main {
 .announcement-bar i.fa-times {
     cursor: pointer;
     opacity: 0.8;
-    transition: opacity 0.2s;
-}
-
-.announcement-bar i.fa-times:hover {
-    opacity: 1;
 }
 
 .announcement-bar.closed {
     display: none;
 }
 
-/* ----- HERO SLIDER - Upgrade #6 ----- */
 .slider-container {
     margin: 20px 0 0;
 }
@@ -235,7 +225,6 @@ main {
     opacity: 1;
 }
 
-/* ----- NIGERIA BADGE - Upgrade #2 ----- */
 .nigeria-badge {
     display: block;
     text-align: center;
@@ -255,7 +244,6 @@ main {
     color: #ffffff;
 }
 
-/* ----- ACTION BUTTONS ----- */
 .action-row {
     display: flex;
     gap: 16px;
@@ -287,7 +275,6 @@ main {
 .btn-primary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    transform: none;
 }
 
 .btn-secondary {
@@ -311,7 +298,6 @@ main {
     color: white;
 }
 
-/* ----- SECTION TITLES ----- */
 .section-title {
     display: flex;
     justify-content: space-between;
@@ -332,7 +318,6 @@ main {
     cursor: pointer;
 }
 
-/* ----- CATEGORY PILLS (Horizontal Scroll on Mobile) ----- */
 .category-scroll {
     display: flex;
     gap: 16px;
@@ -370,7 +355,22 @@ main {
     border-color: var(--accent);
 }
 
-/* ----- PRODUCT SCROLL (Horizontal on Mobile) ----- */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    align-items: center;
+}
+
+.filter-bar select, .filter-bar input {
+    width: auto;
+    margin: 0;
+}
+
 .product-scroll {
     display: flex;
     gap: 20px;
@@ -383,7 +383,6 @@ main {
     display: none;
 }
 
-/* ----- PRODUCT GRID (Desktop) ----- */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -391,7 +390,6 @@ main {
     margin: 30px 0;
 }
 
-/* ----- PRODUCT CARD ----- */
 .product-card {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
@@ -547,7 +545,6 @@ main {
     filter: brightness(1.1);
 }
 
-/* ----- PRODUCT DETAIL PAGE ----- */
 .product-detail-container {
     display: flex;
     flex-wrap: wrap;
@@ -585,6 +582,7 @@ main {
     display: flex;
     gap: 10px;
     overflow-x: auto;
+    padding-bottom: 8px;
 }
 
 .product-detail-thumbnails img {
@@ -687,7 +685,6 @@ main {
     line-height: 1.6;
 }
 
-/* ----- "YOU MIGHT ALSO LIKE" Section ----- */
 .related-products {
     margin-top: 40px;
 }
@@ -708,7 +705,6 @@ main {
     min-width: 200px;
 }
 
-/* ----- TRUST BADGES - Upgrade #5 ----- */
 .trust-badges {
     display: flex;
     justify-content: space-between;
@@ -732,7 +728,6 @@ main {
     color: var(--accent);
 }
 
-/* ----- SUSTAINABILITY SECTION - Upgrade #4 ----- */
 .sustainability-section {
     background: linear-gradient(135deg, var(--accent-light), var(--bg-card));
     border-radius: var(--radius-lg);
@@ -777,7 +772,6 @@ main {
     font-size: 14px;
 }
 
-/* ----- ARTISAN SECTION - Upgrade #7 ----- */
 .artisan-section {
     display: flex;
     align-items: center;
@@ -826,7 +820,6 @@ main {
     margin-bottom: 16px;
 }
 
-/* ----- ARTISAN POPUP MODAL ----- */
 .artisan-popup-overlay {
     display: none;
     position: fixed;
@@ -838,7 +831,6 @@ main {
     z-index: 1001;
     justify-content: center;
     align-items: center;
-    overflow-y: auto;
 }
 
 .artisan-popup-content {
@@ -859,11 +851,6 @@ main {
     font-weight: bold;
     cursor: pointer;
     color: var(--text-muted);
-    z-index: 10;
-}
-
-.artisan-popup-close:hover {
-    color: var(--accent);
 }
 
 .artisan-popup-body {
@@ -897,7 +884,6 @@ main {
 .artisan-popup-title {
     color: var(--text-muted);
     margin-bottom: 20px;
-    font-style: italic;
 }
 
 .artisan-popup-story p {
@@ -906,7 +892,6 @@ main {
     margin-bottom: 12px;
 }
 
-/* ----- IMAGE STYLES ----- */
 .ceo-image {
     width: 160px;
     height: 220px;
@@ -961,7 +946,6 @@ main {
     line-height: 1.6;
 }
 
-/* ----- INFO CARD ----- */
 .info-card {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
@@ -982,7 +966,6 @@ main {
     line-height: 1.6;
 }
 
-/* ----- BOOKS SECTION - Upgrade #12 ----- */
 .books-container {
     display: flex;
     flex-wrap: wrap;
@@ -1067,7 +1050,6 @@ main {
     color: white;
 }
 
-/* ----- BOOK POPUP ----- */
 .book-popup-overlay {
     display: none;
     position: fixed;
@@ -1154,11 +1136,8 @@ main {
     text-decoration: none;
     border-radius: var(--radius-pill);
     font-weight: 600;
-    border: none;
-    cursor: pointer;
 }
 
-/* ----- CUSTOM ORDER POPUP - Upgrade #13 ----- */
 .custom-order-overlay {
     display: none;
     position: fixed;
@@ -1249,7 +1228,6 @@ main {
     margin-top: 10px;
 }
 
-/* ----- WHATSAPP ORDER SUMMARY POPUP ----- */
 .wa-summary-overlay {
     display: none;
     position: fixed;
@@ -1277,10 +1255,6 @@ main {
     color: var(--accent);
 }
 
-.wa-summary-content p {
-    margin-bottom: 10px;
-}
-
 .wa-summary-actions {
     display: flex;
     gap: 12px;
@@ -1291,7 +1265,37 @@ main {
     flex: 1;
 }
 
-/* ----- ADMIN DASHBOARD - Upgrade #17 ----- */
+.blog-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s;
+}
+
+.blog-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.blog-card h3 {
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+.blog-card small {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.blog-card p {
+    margin-top: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
 .admin-login-box {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
@@ -1362,7 +1366,6 @@ main {
     margin: 12px 0 4px;
 }
 
-/* ----- MODAL ----- */
 .modal-overlay {
     display: flex;
     visibility: hidden;
@@ -1406,7 +1409,6 @@ main {
     flex: 1;
 }
 
-/* ----- IMAGE UPLOAD AREA ----- */
 .image-upload-area {
     border: 2px dashed var(--accent);
     border-radius: var(--radius-md);
@@ -1424,7 +1426,6 @@ main {
     border-radius: var(--radius-sm);
 }
 
-/* ----- THEME TOGGLE PILL - Upgrade #9 ----- */
 .theme-toggle, .mobile-theme-toggle {
     display: flex;
     align-items: center;
@@ -1466,7 +1467,6 @@ body.dark-mode .toggle-knob {
     left: 41px;
 }
 
-/* ----- MOBILE MENU (Hamburger) - Upgrade #8 ----- */
 .fa-bars {
     display: block;
     cursor: pointer;
@@ -1523,7 +1523,6 @@ body.dark-mode .toggle-knob {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- FOOTER ----- */
 .app-footer {
     background: var(--bg-secondary);
     padding: 40px 0 30px;
@@ -1580,7 +1579,6 @@ body.dark-mode .toggle-knob {
     color: var(--accent);
 }
 
-/* ----- BOTTOM NAVIGATION (Mobile) ----- */
 .bottom-nav {
     display: none;
     position: fixed;
@@ -1614,7 +1612,6 @@ body.dark-mode .toggle-knob {
     color: var(--accent);
 }
 
-/* ----- BACK TO TOP BUTTON - Suggestion #2 ----- */
 .back-to-top {
     position: fixed;
     bottom: 80px;
@@ -1642,7 +1639,6 @@ body.dark-mode .toggle-knob {
     display: flex;
 }
 
-/* ----- SOCIAL ICONS ----- */
 .social-icons {
     display: flex;
     gap: 20px;
@@ -1660,7 +1656,6 @@ body.dark-mode .toggle-knob {
     color: var(--accent);
 }
 
-/* ----- TOAST NOTIFICATIONS ----- */
 #toast-container {
     position: fixed;
     top: 20px;
@@ -1690,7 +1685,6 @@ body.dark-mode .toggle-knob {
 .toast-error { background: #e74c3c; }
 .toast-info { background: var(--accent); }
 
-/* ----- PAGE SECTIONS ----- */
 .page-section {
     display: none;
 }
@@ -1705,7 +1699,6 @@ body.dark-mode .toggle-knob {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- FEATURE UNAVAILABLE ----- */
 .feature-unavailable {
     text-align: center;
     padding: 60px 20px;
@@ -1714,129 +1707,108 @@ body.dark-mode .toggle-knob {
     margin: 40px 0;
 }
 
-/* ============================================
-   RESPONSIVE DESIGN - Mobile First
-   ============================================ */
-
-/* Mobile (up to 768px) */
 @media (max-width: 768px) {
     .container {
         padding: 0 16px;
     }
-    
     .desktop-nav {
         display: none;
     }
-    
     .bottom-nav {
         display: flex;
     }
-    
     .artisan-section {
         flex-direction: column;
         padding: 30px;
         gap: 30px;
     }
-    
     .section-left, .section-right {
         flex-direction: column;
         text-align: center;
     }
-    
     .section-right {
         flex-direction: column;
     }
-    
     .trust-badges {
         flex-direction: column;
         align-items: center;
         text-align: center;
     }
-    
     .footer-row {
         flex-direction: column;
         text-align: center;
     }
-    
     .product-grid {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 16px;
     }
-    
     .slider-card h2 {
         font-size: 24px;
     }
-    
     .slider-card p {
         font-size: 14px;
     }
-    
     .sustainability-section {
         padding: 40px 20px;
     }
-    
     .admin-dashboard-grid {
         grid-template-columns: 1fr;
     }
-    
     .announcement-bar {
         width: 95%;
         font-size: 11px;
         padding: 8px 12px;
     }
-    
     .product-detail-container {
         flex-direction: column;
     }
-    
     .book-popup-body {
         flex-direction: column;
     }
-    
     .action-row .btn-primary,
     .action-row .btn-secondary {
         padding: 12px 16px;
         font-size: 14px;
     }
-    
     .section-title h3 {
         font-size: 20px;
     }
-    
     .category-pill {
         padding: 8px 20px;
         font-size: 14px;
     }
-    
     .back-to-top {
         bottom: 70px;
         right: 15px;
         width: 40px;
         height: 40px;
     }
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-bar select, .filter-bar input {
+        width: 100%;
+    }
 }
 
-/* Desktop (768px and up) */
 @media (min-width: 768px) {
     .fa-bars {
         display: none;
     }
-    
     .mobile-menu {
         display: none !important;
     }
 }
 
-/* Tablet (768px to 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) {
     .product-grid {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     }
 }
 
-/* Desktop (1024px and up) */
 @media (min-width: 1024px) {
     .product-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
-}
+   }
