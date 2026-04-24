@@ -1,5 +1,6 @@
 // ============================================
 // ABIHANI EXPRESS - COMPLETE APPLICATION
+// All 17 Upgrades + All Features
 // ============================================
 
 // ---------- SUPABASE INITIALIZATION ----------
@@ -17,8 +18,9 @@ const state = {
     sliders: [],
     trustBadges: [],
     sustainabilityBadges: [],
-    imageUrlColumnExists: false,
-    autoSlideInterval: null
+    customOrderFields: [],
+    autoSlideInterval: null,
+    currentProductForWA: null
 };
 
 // ============================================
@@ -51,6 +53,7 @@ function toggleTheme() {
 function closeAnnouncement() {
     const bar = document.getElementById('announcement-bar');
     if (bar) bar.classList.add('closed');
+    localStorage.setItem('announcementClosed', 'true');
 }
 
 function toggleMobileMenu() {
@@ -63,14 +66,27 @@ function closeMobileMenu() {
     if (menu) menu.classList.remove('show');
 }
 
+// Back to Top Button
+function initBackToTop() {
+    const btn = document.createElement('button');
+    btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    btn.className = 'back-to-top';
+    btn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.appendChild(btn);
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) btn.classList.add('visible');
+        else btn.classList.remove('visible');
+    });
+}
+
 // ============================================
 // ROUTING & PAGE NAVIGATION
 // ============================================
 
 let isUpdatingHash = false;
 
-function showPage(pageName, scrollToBooksFlag = false) {
-    console.log('showPage called with:', pageName);
+function showPage(pageName, scrollToBooksFlag = false, productId = null) {
     window.scrollTo(0, 0);
     
     if (!isUpdatingHash && window.location.hash.slice(1).split('?')[0] !== pageName) {
@@ -81,65 +97,28 @@ function showPage(pageName, scrollToBooksFlag = false) {
     
     document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active-page'));
     
-    if (pageName === 'home') {
-        document.getElementById('home-page').classList.add('active-page');
-    } else if (pageName === 'shop') {
-        document.getElementById('shop-page').classList.add('active-page');
-        loadAllProducts();
-    } else if (pageName === 'product-detail') {
-        document.getElementById('product-detail-page').classList.add('active-page');
-    } else if (pageName === 'search') {
-        document.getElementById('search-page').classList.add('active-page');
-        const resultsDiv = document.getElementById('search-results');
-        if (resultsDiv) resultsDiv.innerHTML = '';
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) searchInput.value = '';
-    } else if (pageName === 'admin-login') {
-        document.getElementById('admin-login-page').classList.add('active-page');
-    } else if (pageName === 'admin-dashboard') {
-        if (state.isAdminLoggedIn) {
-            document.getElementById('admin-dashboard-page').classList.add('active-page');
-            renderAdminPanels();
-        } else {
-            showPage('admin-login');
+    const pageMap = {
+        'home': () => document.getElementById('home-page').classList.add('active-page'),
+        'shop': () => { document.getElementById('shop-page').classList.add('active-page'); loadAllProducts(); },
+        'product-detail': () => { document.getElementById('product-detail-page').classList.add('active-page'); if (productId) showProductDetail(productId); },
+        'search': () => { document.getElementById('search-page').classList.add('active-page'); document.getElementById('search-results').innerHTML = ''; document.getElementById('search-input').value = ''; },
+        'admin-login': () => document.getElementById('admin-login-page').classList.add('active-page'),
+        'admin-dashboard': () => { if (state.isAdminLoggedIn) { document.getElementById('admin-dashboard-page').classList.add('active-page'); renderAdminPanels(); } else showPage('admin-login'); },
+        'about': () => { document.getElementById('about-page').classList.add('active-page'); if (scrollToBooksFlag) setTimeout(() => { const books = document.querySelector('.books-container'); if (books) books.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200); },
+        'terms': () => document.getElementById('terms-page').classList.add('active-page'),
+        'privacy': () => document.getElementById('privacy-page').classList.add('active-page'),
+        'contact': () => document.getElementById('contact-page').classList.add('active-page'),
+        'profile': () => {
+            if (state.isAdminLoggedIn) showPage('admin-dashboard');
+            else document.getElementById('profile-page').classList.add('active-page');
         }
-    } else if (pageName === 'about') {
-        document.getElementById('about-page').classList.add('active-page');
-        if (scrollToBooksFlag) {
-            setTimeout(() => {
-                const books = document.querySelector('.books-container');
-                if (books) books.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 200);
-        }
-    } else if (pageName === 'terms') {
-        document.getElementById('terms-page').classList.add('active-page');
-    } else if (pageName === 'privacy') {
-        document.getElementById('privacy-page').classList.add('active-page');
-    } else if (pageName === 'contact') {
-        document.getElementById('contact-page').classList.add('active-page');
-    } else if (pageName === 'profile') {
-        if (state.isAdminLoggedIn) {
-            showPage('admin-dashboard');
-        } else {
-            document.getElementById('profile-page').classList.add('active-page');
-        }
-    }
+    };
     
-    // Update active nav item
+    if (pageMap[pageName]) pageMap[pageName]();
+    
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    if (pageName === 'home') {
-        const navHome = document.getElementById('nav-home');
-        if (navHome) navHome.classList.add('active');
-    } else if (pageName === 'shop' || pageName === 'product-detail') {
-        const navShop = document.getElementById('nav-shop');
-        if (navShop) navShop.classList.add('active');
-    } else if (pageName === 'search') {
-        const navSearch = document.getElementById('nav-search');
-        if (navSearch) navSearch.classList.add('active');
-    } else if (pageName === 'profile' || pageName === 'admin-login' || pageName === 'admin-dashboard') {
-        const navProfile = document.getElementById('nav-profile');
-        if (navProfile) navProfile.classList.add('active');
-    }
+    const navMap = { 'home': 'nav-home', 'shop': 'nav-shop', 'search': 'nav-search', 'profile': 'nav-profile', 'admin-login': 'nav-profile', 'admin-dashboard': 'nav-profile' };
+    if (navMap[pageName]) document.getElementById(navMap[pageName])?.classList.add('active');
 }
 
 function handleHashChange() {
@@ -164,7 +143,7 @@ function scrollToBooks() {
 }
 
 // ============================================
-// STAR RATING GENERATOR
+// STAR RATING GENERATOR - Upgrade #3
 // ============================================
 
 function generateStarRating(rating) {
@@ -192,55 +171,139 @@ function productCardHTML(p) {
     const rating = p.rating || 4.5;
     const reviewCount = p.review_count || 24;
     const stars = generateStarRating(rating);
+    const finalPrice = p.discount_percent ? p.price * (1 - p.discount_percent / 100) : p.price;
+    const discountHtml = p.discount_percent ? `<span class="original-price">₦${p.price?.toLocaleString()}</span>` : '';
+    const discountBadge = p.discount_percent ? `<div class="discount-badge">-${p.discount_percent}%</div>` : '';
+    const lowStockHtml = (p.stock_quantity <= p.low_stock_alert && p.stock_quantity > 0) ? `<div class="low-stock-badge">⚠️ Only ${p.stock_quantity} left</div>` : '';
+    const outOfStock = p.stock_quantity === 0;
     const shareButton = state.isAdminLoggedIn ? 
         `<button class="btn-share-wa-status" onclick="window.shareToWhatsAppStatus(${p.id}); event.stopPropagation();">
             <i class="fab fa-whatsapp"></i> Share to Status
         </button>` : '';
+    
     return `<div class="product-card" onclick="window.showProductDetail(${p.id})">
-        <div class="product-image">${imageContent}</div>
+        <div class="product-image">
+            ${discountBadge}
+            ${lowStockHtml}
+            ${imageContent}
+        </div>
         <div class="product-info">
             <h4>${escapeHtml(p.name)}</h4>
-            <div class="product-price">₦${p.price?.toLocaleString() || '0'}</div>
+            <div class="product-price">₦${Math.round(finalPrice).toLocaleString()}${discountHtml}</div>
             <div class="product-rating">${stars}<span>(${reviewCount} reviews)</span></div>
             <div class="product-vendor"><i class="fas fa-store"></i> ${escapeHtml(p.vendor || 'Abihani Express')}</div>
-            <button class="btn-wa-small" onclick="window.buyNow(${p.id}); event.stopPropagation();"><i class="fab fa-whatsapp"></i> Buy Now</button>
+            <button class="btn-wa-small" onclick="window.openWASummary(${p.id}); event.stopPropagation();" ${outOfStock ? 'disabled' : ''}>
+                <i class="fab fa-whatsapp"></i> ${outOfStock ? 'Out of Stock' : 'Buy Now'}
+            </button>
             ${shareButton}
         </div>
     </div>`;
 }
 
 // ============================================
-// PRODUCT DETAILS
+// WHATSAPP ORDER SUMMARY - Suggestion #1
+// ============================================
+
+function openWASummary(productId) {
+    const product = state.allProducts?.find(p => p.id === productId);
+    if (!product) return;
+    if (product.stock_quantity === 0) { showToast('Out of stock!', 'error'); return; }
+    
+    state.currentProductForWA = product;
+    const finalPrice = product.discount_percent ? product.price * (1 - product.discount_percent / 100) : product.price;
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'wa-summary-overlay';
+    overlay.id = 'wa-summary-overlay';
+    overlay.innerHTML = `
+        <div class="wa-summary-content">
+            <h3>📝 Confirm Order</h3>
+            <p><strong>${escapeHtml(product.name)}</strong></p>
+            <p>Price: ₦${Math.round(finalPrice).toLocaleString()}</p>
+            <p>Quantity: <input type="number" id="wa-quantity" value="1" min="1" max="${product.stock_quantity}" style="width:80px; padding:8px; border-radius:20px; border:1px solid var(--border);"></p>
+            <div class="wa-summary-actions">
+                <button class="btn-secondary" onclick="closeWASummary()">Cancel</button>
+                <button class="btn-primary" onclick="confirmAndSendWA()">Send to WhatsApp</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeWASummary() {
+    const overlay = document.getElementById('wa-summary-overlay');
+    if (overlay) {
+        overlay.remove();
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function confirmAndSendWA() {
+    const product = state.currentProductForWA;
+    if (!product) return;
+    const quantity = parseInt(document.getElementById('wa-quantity')?.value) || 1;
+    const finalPrice = product.discount_percent ? product.price * (1 - product.discount_percent / 100) : product.price;
+    const totalPrice = finalPrice * quantity;
+    const whatsapp = state.siteSettings?.whatsapp_number || ENV.WHATSAPP_NUMBER;
+    const message = `Hello Abihani Express!%0a%0aI'm interested in buying:%0a🛍️ ${product.name}%0a📦 Quantity: ${quantity}%0a💰 Total: ₦${Math.round(totalPrice).toLocaleString()}%0a%0aPlease provide payment details.`;
+    const cleanNumber = whatsapp.replace(/[^0-9]/g, '');
+    closeWASummary();
+    window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
+}
+
+// ============================================
+// PRODUCT DETAILS - Upgrade #15
 // ============================================
 
 async function showProductDetail(productId) {
-    console.log('showProductDetail called for:', productId);
     const { data, error } = await supabase
         .from('products')
         .select('*, categories(name), subcategories(name)')
         .eq('id', productId)
         .single();
-    if (error || !data) { 
-        showToast('Product not found', 'error'); 
-        return; 
-    }
+    if (error || !data) { showToast('Product not found', 'error'); return; }
     
     const product = data;
-    const container = document.getElementById('product-detail-container');
-    if (!container) return;
-    
     const stars = generateStarRating(product.rating || 4.5);
-    const imageContent = product.image_url 
-        ? `<img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" style="width:100%;height:100%;object-fit:cover;">`
-        : `<div style="font-size:80px;">${product.image_icon || '📦'}</div>`;
+    const finalPrice = product.discount_percent ? product.price * (1 - product.discount_percent / 100) : product.price;
+    const discountHtml = product.discount_percent ? `<span class="product-detail-original-price">₦${product.price?.toLocaleString()}</span>` : '';
     
+    let stockHtml = '';
+    if (product.stock_quantity === 0) stockHtml = '<span class="stock-out">❌ Out of Stock</span>';
+    else if (product.stock_quantity <= product.low_stock_alert) stockHtml = `<span class="stock-low">⚠️ Only ${product.stock_quantity} left in stock!</span>`;
+    else stockHtml = `<span class="stock-in-stock">✅ In Stock (${product.stock_quantity} available)</span>`;
+    
+    // Parse multiple images
+    let images = [];
+    try { images = JSON.parse(product.image_urls || '[]'); } catch(e) { images = []; }
+    if (product.image_url && !images.includes(product.image_url)) images.unshift(product.image_url);
+    if (images.length === 0) images = [null];
+    
+    const mainImage = images[0] ? `<img src="${escapeHtml(images[0])}" alt="${escapeHtml(product.name)}" id="detail-main-image">` : `<div style="font-size:80px;">${product.image_icon || '📦'}</div>`;
+    const thumbnails = images.slice(1).map(img => img ? `<img src="${escapeHtml(img)}" onclick="document.getElementById('detail-main-image').src='${escapeHtml(img)}'">` : '').join('');
+    
+    // Load related products
+    const { data: related } = await supabase
+        .from('products')
+        .select('*')
+        .eq('category_id', product.category_id)
+        .neq('id', productId)
+        .limit(4);
+    
+    const container = document.getElementById('product-detail-container');
     container.innerHTML = `
         <div class="product-detail-container">
-            <div class="product-detail-image">${imageContent}</div>
+            <div class="product-detail-images">
+                <div class="product-detail-main-image">${mainImage}</div>
+                <div class="product-detail-thumbnails">${thumbnails}</div>
+            </div>
             <div class="product-detail-info">
                 <h1>${escapeHtml(product.name)}</h1>
-                <div class="product-detail-price">₦${product.price?.toLocaleString() || '0'}</div>
+                <div class="product-detail-price">₦${Math.round(finalPrice).toLocaleString()}${discountHtml}</div>
                 <div class="product-detail-rating">${stars} <span>(${product.review_count || 0} reviews)</span></div>
+                <div class="product-detail-stock">${stockHtml}</div>
                 <div class="product-detail-meta">
                     <p><i class="fas fa-tag"></i> ${product.categories?.name || 'Uncategorized'}</p>
                     <p><i class="fas fa-map-marker-alt"></i> ${product.vendor_location || 'Potiskum, Yobe State'}</p>
@@ -250,28 +313,98 @@ async function showProductDetail(productId) {
                     <h4>Description</h4>
                     <p>${product.description || 'No description available'}</p>
                 </div>
-                <button class="btn-primary" onclick="window.buyNow(${product.id})"><i class="fab fa-whatsapp"></i> Buy Now via WhatsApp</button>
+                <button class="btn-primary" onclick="window.openWASummary(${product.id})" ${product.stock_quantity === 0 ? 'disabled' : ''}>
+                    <i class="fab fa-whatsapp"></i> ${product.stock_quantity === 0 ? 'Out of Stock' : 'Buy Now via WhatsApp'}
+                </button>
                 <button class="btn-secondary" style="margin-top:12px;" onclick="window.showPage('shop')">← Back to Products</button>
             </div>
         </div>
+        ${related && related.length ? `
+        <div class="related-products">
+            <h3>✨ You might also like</h3>
+            <div class="related-scroll">
+                ${related.map(p => productCardHTML(p)).join('')}
+            </div>
+        </div>` : ''}
     `;
     showPage('product-detail');
 }
 
 // ============================================
-// BUY NOW
+// SEARCH & FILTERS - Suggestion #3
 // ============================================
 
-async function buyNow(productId) {
-    const { data, error } = await supabase.from('products').select('*').eq('id', productId).single();
-    if (error || !data) { 
-        showToast('Product not found', 'error'); 
-        return; 
-    }
-    const whatsapp = state.siteSettings?.whatsapp_number || ENV.WHATSAPP_NUMBER;
-    const message = `Hello Abihani Express!%0a%0aI'm interested in buying:%0a🛍️ ${data.name}%0a💰 ₦${data.price?.toLocaleString()}%0a%0aPlease provide payment details.`;
-    const cleanNumber = whatsapp.replace(/[^0-9]/g, '');
-    window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
+let searchDebounceTimer = null;
+let currentFilter = 'all';
+let currentSort = 'default';
+let currentPriceMax = 100000;
+
+async function searchProducts() {
+    const query = document.getElementById('search-input')?.value.toLowerCase().trim();
+    const resultsDiv = document.getElementById('search-results');
+    if (!resultsDiv) return;
+    if (query === '') { clearTimeout(searchDebounceTimer); resultsDiv.innerHTML = '<p style="text-align:center;">Type to search products...</p>'; return; }
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(async () => {
+        let searchQuery = supabase.from('products').select('*');
+        if (query) searchQuery = searchQuery.ilike('name', `%${query}%`);
+        const { data } = await searchQuery;
+        resultsDiv.innerHTML = (data && data.length) ? data.map(p => productCardHTML(p)).join('') : '<p style="text-align:center;">No products found</p>';
+    }, 300);
+}
+
+function renderFilterUI() {
+    const filterContainer = document.getElementById('products-page');
+    const existingFilter = document.querySelector('.filter-bar');
+    if (existingFilter) existingFilter.remove();
+    
+    const filterBar = document.createElement('div');
+    filterBar.className = 'filter-bar';
+    filterBar.style.cssText = 'display:flex; gap:12px; flex-wrap:wrap; margin:20px 0; padding:16px; background:var(--bg-secondary); border-radius:20px;';
+    filterBar.innerHTML = `
+        <select id="filter-category" class="admin-input" style="width:auto; margin:0;">
+            <option value="all">All Categories</option>
+            ${state.allCategories.map(c => `<option value="${c.id}">${c.icon || '📦'} ${escapeHtml(c.name)}</option>`).join('')}
+        </select>
+        <select id="filter-sort" class="admin-input" style="width:auto; margin:0;">
+            <option value="default">Sort by: Default</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="rating">Highest Rated</option>
+        </select>
+        <div style="flex:1; min-width:150px;">
+            <input type="range" id="price-range" min="0" max="200000" step="5000" value="100000" style="width:100%;">
+            <span>Max Price: ₦<span id="price-value">100,000</span></span>
+        </div>
+    `;
+    const sectionTitle = document.querySelector('#products-page .section-title');
+    if (sectionTitle) sectionTitle.after(filterBar);
+    
+    document.getElementById('filter-category')?.addEventListener('change', applyFilters);
+    document.getElementById('filter-sort')?.addEventListener('change', applyFilters);
+    document.getElementById('price-range')?.addEventListener('input', (e) => {
+        document.getElementById('price-value').textContent = parseInt(e.target.value).toLocaleString();
+        currentPriceMax = parseInt(e.target.value);
+        applyFilters();
+    });
+}
+
+async function applyFilters() {
+    const categoryId = document.getElementById('filter-category')?.value;
+    const sortBy = document.getElementById('filter-sort')?.value;
+    
+    let query = supabase.from('products').select('*');
+    if (categoryId && categoryId !== 'all') query = query.eq('category_id', parseInt(categoryId));
+    query = query.lte('price', currentPriceMax);
+    
+    const { data } = await query;
+    let products = data || [];
+    
+    if (sortBy === 'price_asc') products.sort((a,b) => a.price - b.price);
+    else if (sortBy === 'price_desc') products.sort((a,b) => b.price - a.price);
+    else if (sortBy === 'rating') products.sort((a,b) => (b.rating || 0) - (a.rating || 0));
+    
+    renderAllProducts(products);
 }
 
 // ============================================
@@ -279,23 +412,44 @@ async function buyNow(productId) {
 // ============================================
 
 async function loadSiteSettings() {
-    console.log('Loading site settings...');
     const { data, error } = await supabase.from('site_settings').select('*').eq('id', 1).single();
-    if (error) { 
-        console.error('Error loading site settings:', error); 
-        return; 
-    }
+    if (error) { console.error('Error loading site settings:', error); return; }
     
     state.siteSettings = data;
     
-    try { state.sliders = JSON.parse(data.sliders || '[]'); } catch(e) { state.sliders = []; }
-    try { state.trustBadges = JSON.parse(data.trust_badges_json || '[]'); } catch(e) { state.trustBadges = []; }
-    try { state.sustainabilityBadges = JSON.parse(data.sustainability_badges_json || '[]'); } catch(e) { state.sustainabilityBadges = []; }
+    // Load sliders from separate columns
+    state.sliders = [];
+    for (let i = 1; i <= 5; i++) {
+        if (data[`slider${i}_enabled`] && data[`slider${i}_title`]) {
+            state.sliders.push({ title: data[`slider${i}_title`], subtitle: data[`slider${i}_subtitle`] });
+        }
+    }
     
+    // Load trust badges
+    state.trustBadges = [];
+    for (let i = 1; i <= 4; i++) {
+        if (data[`trust_badge${i}_text`]) {
+            state.trustBadges.push({ icon: data[`trust_badge${i}_icon`], text: data[`trust_badge${i}_text`] });
+        }
+    }
+    
+    // Load sustainability badges
+    state.sustainabilityBadges = [];
+    for (let i = 1; i <= 3; i++) {
+        if (data[`sustain_badge${i}_text`]) {
+            state.sustainabilityBadges.push({ icon: data[`sustain_badge${i}_icon`], text: data[`sustain_badge${i}_text`] });
+        }
+    }
+    
+    // Load custom order fields
+    try { state.customOrderFields = JSON.parse(data.custom_order_fields_json || '[]'); } catch(e) { state.customOrderFields = []; }
+    
+    // Apply colors
     if (data.primary_color) document.documentElement.style.setProperty('--accent', data.primary_color);
     if (data.background_color) document.documentElement.style.setProperty('--bg-primary', data.background_color);
     if (data.text_color) document.documentElement.style.setProperty('--text-primary', data.text_color);
     
+    // Update HTML elements
     document.title = data.site_name || 'Abihani Express';
     const logoH1 = document.querySelector('.logo h1');
     if (logoH1) logoH1.textContent = data.site_name || 'Abihani Express';
@@ -314,8 +468,7 @@ async function loadSiteSettings() {
     const announcementSpan = document.querySelector('#announcement-bar span');
     if (announcementSpan && data.announcement_text) announcementSpan.innerHTML = data.announcement_text;
     
-    const ceoBioPlaceholder = document.getElementById('ceo-bio-placeholder');
-    if (ceoBioPlaceholder && data.ceo_bio) ceoBioPlaceholder.textContent = data.ceo_bio;
+    if (localStorage.getItem('announcementClosed') === 'true') closeAnnouncement();
     
     renderSlider();
     renderInfoSections();
@@ -330,6 +483,7 @@ async function loadSiteSettings() {
     renderPrivacyPage();
     renderAboutPage();
     renderMissionSection();
+    renderBlogSection();
 }
 
 async function loadCategories() {
@@ -337,6 +491,7 @@ async function loadCategories() {
     if (!error) state.allCategories = data || [];
     renderCategoriesHome();
     renderCategoriesFilter();
+    renderFilterUI();
 }
 
 async function loadSubcategories() {
@@ -345,15 +500,23 @@ async function loadSubcategories() {
 }
 
 async function loadFeaturedProducts() {
-    const { data, error } = await supabase.from('products').select('*, categories(name), subcategories(name)').eq('featured', true).order('featured_order');
+    const { data, error } = await supabase.from('products').select('*').eq('featured', true).order('featured_order');
     if (!error) renderFeaturedProducts(data || []);
 }
 
 async function loadAllProducts(categoryId = null) {
-    let query = supabase.from('products').select('*, categories(name), subcategories(name)');
+    let query = supabase.from('products').select('*');
     if (categoryId) query = query.eq('category_id', categoryId);
     const { data, error } = await query;
-    if (!error) renderAllProducts(data || []);
+    if (!error) {
+        state.allProducts = data || [];
+        renderAllProducts(data || []);
+    }
+}
+
+async function loadBlogPosts() {
+    const { data, error } = await supabase.from('blog_posts').select('*').eq('published', true).order('date', { ascending: false });
+    if (!error) renderBlogPosts(data || []);
 }
 
 // ============================================
@@ -363,19 +526,16 @@ async function loadAllProducts(categoryId = null) {
 function renderSlider() {
     const container = document.getElementById('slider-container');
     if (!container) return;
-    
     if (!state.sliders || state.sliders.length === 0) {
         container.innerHTML = `<div class="slider-card"><h2>Welcome to Abihani Express</h2><p>Premium handcrafted leather goods from Yobe State, Nigeria</p></div><div class="slider-dots"><span class="dot active"></span></div>`;
         return;
     }
-    
     const renderSlide = (index) => {
         const slide = state.sliders[index];
         container.innerHTML = `<div class="slider-card"><h2>${escapeHtml(slide.title)}</h2><p>${escapeHtml(slide.subtitle)}</p></div>
             <div class="slider-dots">${state.sliders.map((_, i) => `<span class="dot ${i === index ? 'active' : ''}" onclick="window.setSlide(${i})"></span>`).join('')}</div>`;
     };
     renderSlide(0);
-    
     if (state.autoSlideInterval) clearInterval(state.autoSlideInterval);
     if (state.sliders.length > 1) {
         state.autoSlideInterval = setInterval(() => {
@@ -399,17 +559,18 @@ function renderCategoriesHome() {
     const container = document.getElementById('categories-home');
     if (!container) return;
     const cats = state.allCategories || [];
-    if (!cats.length) { 
-        container.innerHTML = '<div class="category-pill">Loading...</div>'; 
-        return; 
-    }
+    if (!cats.length) { container.innerHTML = '<div class="category-pill">Loading...</div>'; return; }
     container.innerHTML = cats.map(cat => `<div class="category-pill" onclick="window.filterByCategoryAndGoToShop(${cat.id})"><span style="font-size:18px; margin-right:6px;">${cat.icon || '📦'}</span> ${cat.name}</div>`).join('');
 }
 
 function filterByCategoryAndGoToShop(categoryId) {
     sessionStorage.setItem('filterCategory', categoryId);
     showPage('shop');
-    setTimeout(() => filterByCategory(categoryId), 100);
+    setTimeout(() => {
+        const catFilter = document.getElementById('filter-category');
+        if (catFilter) catFilter.value = categoryId;
+        applyFilters();
+    }, 100);
 }
 
 function renderCategoriesFilter() {
@@ -438,8 +599,8 @@ function renderFeaturedProducts(products) {
     if (!container) return;
     if (!products || products.length === 0) {
         const fallbacks = [
-            { id: 1, name: 'Classic Leather Brogues', price: 45000, image_icon: '👞', rating: 4.8, review_count: 128 },
-            { id: 2, name: 'Premium Tote Bag', price: 38000, image_icon: '👜', rating: 4.9, review_count: 95 }
+            { id: 1, name: 'Classic Leather Brogues', price: 45000, image_icon: '👞', rating: 4.8, review_count: 128, stock_quantity: 10, low_stock_alert: 5 },
+            { id: 2, name: 'Premium Tote Bag', price: 38000, image_icon: '👜', rating: 4.9, review_count: 95, stock_quantity: 10, low_stock_alert: 5 }
         ];
         container.innerHTML = fallbacks.map(p => productCardHTML(p)).join('');
         return;
@@ -452,10 +613,10 @@ function renderAllProducts(products) {
     if (!container) return;
     if (!products || products.length === 0) {
         const fallbacks = [
-            { id: 1, name: 'Classic Leather Brogues', price: 45000, image_icon: '👞', rating: 4.8, review_count: 128 },
-            { id: 2, name: 'Premium Tote Bag', price: 38000, image_icon: '👜', rating: 4.9, review_count: 95 },
-            { id: 3, name: 'Genuine Leather Belt', price: 12000, image_icon: '🔗', rating: 4.5, review_count: 67 },
-            { id: 4, name: 'Handmade Sandals', price: 22000, image_icon: '👡', rating: 4.6, review_count: 52 }
+            { id: 1, name: 'Classic Leather Brogues', price: 45000, image_icon: '👞', rating: 4.8, review_count: 128, stock_quantity: 10, low_stock_alert: 5 },
+            { id: 2, name: 'Premium Tote Bag', price: 38000, image_icon: '👜', rating: 4.9, review_count: 95, stock_quantity: 10, low_stock_alert: 5 },
+            { id: 3, name: 'Genuine Leather Belt', price: 12000, image_icon: '🔗', rating: 4.5, review_count: 67, stock_quantity: 10, low_stock_alert: 5 },
+            { id: 4, name: 'Handmade Sandals', price: 22000, image_icon: '👡', rating: 4.6, review_count: 52, stock_quantity: 10, low_stock_alert: 5 }
         ];
         container.innerHTML = fallbacks.map(p => productCardHTML(p)).join('');
         return;
@@ -545,8 +706,8 @@ function renderArtisanSection() {
     if (!container) return;
     const s = state.siteSettings || {};
     const artisanImageUrl = s.artisan_image_url || 'https://placehold.co/500x500/e6d5c0/8b5a2b?text=Master+Artisan';
-    const artisanName = s.artisan_name || 'Malam Usman Garba';
-    const artisanStory = s.artisan_story || 'With over 20 years of leather crafting experience, Malam Usman leads our workshop in Potiskum.';
+    const artisanName = s.artisan_name || 'Adamu Yahaya AYFOOTIES';
+    const artisanStory = s.artisan_story || 'With over 20 years of leather crafting experience, Adamu Yahaya leads our workshop in Potiskum.';
     container.innerHTML = `
         <div class="artisan-section">
             <div class="artisan-image"><img src="${artisanImageUrl}" alt="${escapeHtml(artisanName)}"></div>
@@ -565,8 +726,8 @@ function renderArtisanPopup() {
     if (!container) return;
     const s = state.siteSettings || {};
     const artisanImageUrl = s.artisan_image_url || 'https://placehold.co/400x400/e6d5c0/8b5a2b?text=Master+Artisan';
-    const artisanName = s.artisan_name || 'Malam Usman Garba';
-    const artisanFullStory = s.artisan_full_story || s.artisan_story || 'Malam Usman Garba has been crafting leather goods for over 20 years. He learned the trade from his father, who learned from his grandfather. Today, he leads a team of 15 artisans at the Abihani Express workshop in Potiskum, Yobe State. Every product that leaves our workshop is personally inspected by him to ensure the highest quality standards. His expertise spans traditional Nigerian leatherwork, modern shoe design, bag crafting, and custom accessories. Malam Usman believes that leather crafting is not just a trade but an art form passed down through generations.';
+    const artisanName = s.artisan_name || 'Adamu Yahaya AYFOOTIES';
+    const artisanFullStory = s.artisan_full_story || s.artisan_story || 'Adamu Yahaya AYFOOTIES has been crafting leather goods for over 20 years. He learned the trade from his father, who learned from his grandfather. Today, he leads a team of 15 artisans at the Abihani Express workshop in Potiskum, Yobe State.';
     container.innerHTML = `
         <div id="artisan-popup" class="artisan-popup-overlay">
             <div class="artisan-popup-content">
@@ -651,16 +812,27 @@ function renderCustomOrderForm() {
     const s = state.siteSettings || {};
     const title = s.custom_order_title || 'Custom Order Request';
     const subtitle = s.custom_order_subtitle || 'Fill this form and we will WhatsApp you within minutes to confirm.';
+    const fields = state.customOrderFields.length ? state.customOrderFields : [
+        {name:"name",label:"Full Name",type:"text",required:true,placeholder:"Enter your full name"},
+        {name:"product_type",label:"Product Type",type:"text",required:true,placeholder:"e.g., Shoes, Bag, Belt"},
+        {name:"description",label:"Description",type:"textarea",required:true,placeholder:"Describe exactly what you want and we will strive to make it for you"}
+    ];
+    
     container.innerHTML = `
         <div class="custom-order-content">
             <span class="custom-order-close" onclick="window.closeCustomOrderPopup()">&times;</span>
             <h3><i class="fas fa-pen-alt"></i> ${escapeHtml(title)}</h3>
             <p>${escapeHtml(subtitle)}</p>
             <form id="custom-order-form" onsubmit="event.preventDefault(); window.submitCustomOrder()">
-                <div class="form-group"><label>Your Name *</label><input type="text" id="order-name" required></div>
-                <div class="form-group"><label>Phone Number</label><input type="tel" id="order-phone"></div>
-                <div class="form-group"><label>Product Type *</label><input type="text" id="order-product_type" required></div>
-                <div class="form-group"><label>Description *</label><textarea id="order-description" rows="4" required></textarea></div>
+                ${fields.map(f => `
+                    <div class="form-group">
+                        <label>${escapeHtml(f.label)} ${f.required ? '<span class="required">*</span>' : ''}</label>
+                        ${f.type === 'textarea' ? 
+                            `<textarea id="order-${f.name}" rows="4" placeholder="${escapeHtml(f.placeholder || '')}" ${f.required ? 'required' : ''}></textarea>` : 
+                            `<input type="${f.type}" id="order-${f.name}" placeholder="${escapeHtml(f.placeholder || '')}" ${f.required ? 'required' : ''}>`
+                        }
+                    </div>
+                `).join('')}
                 <button type="submit" class="btn-submit-order"><i class="fab fa-whatsapp"></i> Send Request via WhatsApp</button>
             </form>
         </div>
@@ -678,14 +850,24 @@ function closeCustomOrderPopup() {
 }
 
 function submitCustomOrder() {
-    const name = document.getElementById('order-name')?.value.trim();
-    const productType = document.getElementById('order-product_type')?.value.trim();
-    const description = document.getElementById('order-description')?.value.trim();
-    const phone = document.getElementById('order-phone')?.value.trim();
-    if (!name || !productType || !description) { showToast('Please fill all required fields', 'error'); return; }
+    const fields = state.customOrderFields.length ? state.customOrderFields : [
+        {name:"name",required:true},{name:"product_type",required:true},{name:"description",required:true}
+    ];
+    
+    for (const field of fields) {
+        if (field.required) {
+            const value = document.getElementById(`order-${field.name}`)?.value.trim();
+            if (!value) { showToast(`Please fill in ${field.label || field.name}`, 'error'); return; }
+        }
+    }
+    
+    let message = `🛍️ NEW CUSTOM ORDER 🛍️%0a%0a`;
+    for (const field of fields) {
+        const value = document.getElementById(`order-${field.name}`)?.value.trim();
+        if (value) message += `*${field.label || field.name}:* ${value}%0a`;
+    }
+    
     const whatsappNumber = state.siteSettings?.whatsapp_number || '2347067551684';
-    let message = `🛍️ NEW CUSTOM ORDER 🛍️%0a%0a*Name:* ${name}%0a*Product:* ${productType}%0a*Description:* ${description}`;
-    if (phone) message += `%0a*Phone:* ${phone}`;
     window.open(`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${message}`, '_blank');
     closeCustomOrderPopup();
     showToast('Order request sent!', 'success');
@@ -709,27 +891,28 @@ function renderAboutPage() {
     if (who && state.siteSettings?.about_who_we_are) {
         who.innerHTML = `<div class="info-card"><h4>Who We Are</h4><p>${escapeHtml(state.siteSettings.about_who_we_are)}</p></div>`;
     }
-    if (mission && state.siteSettings?.about_mission) {
-        mission.innerHTML = `<div class="info-card"><h4>Our Mission</h4><p>${escapeHtml(state.siteSettings.about_mission)}</p></div>`;
-    }
 }
 
-// ============================================
-// SEARCH FUNCTION
-// ============================================
+function renderBlogSection() {
+    const container = document.getElementById('blog-section');
+    if (!container) return;
+    loadBlogPosts();
+}
 
-let searchDebounceTimer = null;
-
-async function searchProducts() {
-    const query = document.getElementById('search-input')?.value.toLowerCase().trim();
-    const resultsDiv = document.getElementById('search-results');
-    if (!resultsDiv) return;
-    if (query === '') { clearTimeout(searchDebounceTimer); resultsDiv.innerHTML = '<p style="text-align:center;">Type to search products...</p>'; return; }
-    clearTimeout(searchDebounceTimer);
-    searchDebounceTimer = setTimeout(async () => {
-        const { data } = await supabase.from('products').select('*').ilike('name', `%${query}%`);
-        resultsDiv.innerHTML = (data && data.length) ? data.map(p => productCardHTML(p)).join('') : '<p style="text-align:center;">No products found</p>';
-    }, 300);
+function renderBlogPosts(posts) {
+    const container = document.getElementById('blog-posts-container');
+    if (!container) return;
+    if (!posts || posts.length === 0) {
+        container.innerHTML = '<p>No blog posts yet. Check back soon!</p>';
+        return;
+    }
+    container.innerHTML = posts.map(post => `
+        <div class="blog-card" style="background:var(--bg-card); border-radius:20px; padding:20px; margin-bottom:20px; border:1px solid var(--border);">
+            <h3 style="color:var(--accent); margin-bottom:8px;">${escapeHtml(post.title)}</h3>
+            <small style="color:var(--text-muted);">${new Date(post.date).toLocaleDateString()}</small>
+            <p style="margin-top:12px; color:var(--text-secondary);">${escapeHtml(post.content)}</p>
+        </div>
+    `).join('');
 }
 
 // ============================================
@@ -788,13 +971,17 @@ async function renderAdminPanels() {
     const subList = document.getElementById('admin-subcategories-list');
     if (subList) subList.innerHTML = subs.data?.map(s => `<div class="admin-item"><span>${escapeHtml(s.name)} (${s.categories?.name || 'Unknown'})</span><span class="admin-actions"><i class="fas fa-edit" onclick="window.editSubcategory(${s.id})"></i><i class="fas fa-trash" onclick="window.deleteSubcategory(${s.id})"></i></span></div>`).join('') || '<p>No subcategories</p>';
     
-    const prods = await supabase.from('products').select('*, categories(name)').order('id');
+    const prods = await supabase.from('products').select('*').order('id');
     const prodList = document.getElementById('admin-products-list');
     if (prodList) prodList.innerHTML = prods.data?.map(p => `<div class="admin-item"><span>${p.image_icon || '📦'} ${escapeHtml(p.name)} - ₦${p.price}</span><span class="admin-actions"><i class="fas fa-star${p.featured ? ' text-warning' : ''}" onclick="window.toggleFeatured(${p.id})" style="color:${p.featured ? '#FFD700' : 'var(--text-muted)'}; cursor:pointer;"></i><i class="fas fa-edit" onclick="window.editProduct(${p.id})"></i><i class="fas fa-trash" onclick="window.deleteProduct(${p.id})"></i></span></div>`).join('') || '<p>No products</p>';
     
     const fb = await supabase.from('feedback').select('*').order('created_at', { ascending: false });
     const fbList = document.getElementById('admin-feedback-list');
     if (fbList) fbList.innerHTML = fb.data?.map(f => `<div class="admin-item" style="flex-direction:column; align-items:flex-start;"><div style="width:100%; display:flex; justify-content:space-between;"><strong>${escapeHtml(f.name || 'Anonymous')}</strong><span><i class="fas fa-trash" onclick="window.deleteFeedback(${f.id})" style="color:red; cursor:pointer;"></i></span></div><small>${escapeHtml(f.email)} | ${new Date(f.created_at).toLocaleString()}</small><p>${escapeHtml(f.message)}</p></div>`).join('') || '<p>No feedback</p>';
+    
+    const blogs = await supabase.from('blog_posts').select('*').order('date', { ascending: false });
+    const blogList = document.getElementById('admin-blog-list');
+    if (blogList) blogList.innerHTML = blogs.data?.map(b => `<div class="admin-item"><span>${escapeHtml(b.title)}</span><span class="admin-actions"><i class="fas fa-edit" onclick="window.editBlogPost(${b.id})"></i><i class="fas fa-trash" onclick="window.deleteBlogPost(${b.id})"></i></span></div>`).join('') || '<p>No blog posts</p>';
 }
 
 async function toggleFeatured(productId) {
@@ -871,6 +1058,9 @@ async function editSiteSettings() {
             <div class="settings-section"><h4>⚙️ Custom Order</h4>
                 <label>Form Title</label><input type="text" id="edit-custom-title" class="admin-input" value="${escapeHtml(s.custom_order_title || '')}">
                 <label>Form Subtitle</label><input type="text" id="edit-custom-subtitle" class="admin-input" value="${escapeHtml(s.custom_order_subtitle || '')}">
+                <label>Custom Fields (JSON - advanced users)</label>
+                <textarea id="edit-custom-fields" class="admin-input" rows="6">${escapeHtml(s.custom_order_fields_json || '[]')}</textarea>
+                <small>Format: [{"name":"field_name","label":"Display Label","type":"text","required":true,"placeholder":"Hint text"}]</small>
             </div>
             <div class="modal-actions" style="margin-top:20px;">
                 <button class="btn-secondary" onclick="window.closeModal()">Cancel</button>
@@ -921,7 +1111,8 @@ async function saveSiteSettings() {
         book2_is_free: document.getElementById('edit-book2-free')?.checked,
         book2_whatsapp_message: document.getElementById('edit-book2-wa')?.value,
         custom_order_title: document.getElementById('edit-custom-title')?.value,
-        custom_order_subtitle: document.getElementById('edit-custom-subtitle')?.value
+        custom_order_subtitle: document.getElementById('edit-custom-subtitle')?.value,
+        custom_order_fields_json: document.getElementById('edit-custom-fields')?.value
     };
     const { error } = await supabase.from('site_settings').update(updates).eq('id', 1);
     if (error) { showToast('Error: ' + error.message, 'error'); return; }
@@ -970,6 +1161,7 @@ async function deleteCategory(id) {
     showToast('Category deleted', 'success');
 }
 
+// Subcategory CRUD
 async function showAddSubcategory() {
     const { data: cats } = await supabase.from('categories').select('*');
     openModal(`<h3>Add Subcategory</h3><label>Parent Category</label><select id="sub-cat" class="admin-input">${cats?.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}</select><label>Name</label><input type="text" id="sub-name" class="admin-input"><div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.saveSubcategory()">Save</button></div>`);
@@ -1005,9 +1197,22 @@ async function deleteSubcategory(id) {
     showToast('Deleted', 'success');
 }
 
+// Product CRUD
 async function showAddProduct() {
     const { data: cats } = await supabase.from('categories').select('*');
-    openModal(`<h3>Add Product</h3><label>Name</label><input type="text" id="prod-name" class="admin-input"><label>Price (₦)</label><input type="number" id="prod-price" class="admin-input"><label>Category</label><select id="prod-cat" class="admin-input" onchange="window.updateSubcatOptions()">${cats?.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}</select><label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select><label>Emoji Icon</label><input type="text" id="prod-icon" class="admin-input" value="📦"><label>Image URL</label><input type="url" id="prod-image" class="admin-input"><label>Description</label><textarea id="prod-desc" class="admin-input" rows="3"></textarea><label><input type="checkbox" id="prod-featured"> Featured</label><div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.saveProduct()">Save</button></div>`);
+    openModal(`<h3>Add Product</h3>
+        <label>Name</label><input type="text" id="prod-name" class="admin-input">
+        <label>Price (₦)</label><input type="number" id="prod-price" class="admin-input">
+        <label>Discount %</label><input type="number" id="prod-discount" class="admin-input" value="0">
+        <label>Stock Quantity</label><input type="number" id="prod-stock" class="admin-input" value="10">
+        <label>Low Stock Alert (at or below)</label><input type="number" id="prod-low-stock" class="admin-input" value="5">
+        <label>Category</label><select id="prod-cat" class="admin-input" onchange="window.updateSubcatOptions()">${cats?.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('')}</select>
+        <label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select>
+        <label>Emoji Icon</label><input type="text" id="prod-icon" class="admin-input" value="📦">
+        <label>Image URL</label><input type="url" id="prod-image" class="admin-input">
+        <label>Description</label><textarea id="prod-desc" class="admin-input" rows="3"></textarea>
+        <label><input type="checkbox" id="prod-featured"> Featured</label>
+        <div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.saveProduct()">Save</button></div>`);
     window.updateSubcatOptions = async function() {
         const catId = document.getElementById('prod-cat')?.value;
         const { data: subs } = await supabase.from('subcategories').select('*').eq('category_id', catId);
@@ -1022,6 +1227,9 @@ async function saveProduct() {
     if (!name || !price) { showToast('Name and price required', 'error'); return; }
     await supabase.from('products').insert([{
         name, price,
+        discount_percent: parseInt(document.getElementById('prod-discount')?.value) || 0,
+        stock_quantity: parseInt(document.getElementById('prod-stock')?.value) || 10,
+        low_stock_alert: parseInt(document.getElementById('prod-low-stock')?.value) || 5,
         category_id: parseInt(document.getElementById('prod-cat')?.value) || null,
         subcategory_id: parseInt(document.getElementById('prod-sub')?.value) || null,
         image_icon: document.getElementById('prod-icon')?.value || '📦',
@@ -1037,7 +1245,19 @@ async function saveProduct() {
 async function editProduct(id) {
     const { data } = await supabase.from('products').select('*').eq('id', id).single();
     const { data: cats } = await supabase.from('categories').select('*');
-    openModal(`<h3>Edit Product</h3><label>Name</label><input type="text" id="prod-name" class="admin-input" value="${escapeHtml(data?.name || '')}"><label>Price</label><input type="number" id="prod-price" class="admin-input" value="${data?.price || 0}"><label>Category</label><select id="prod-cat" class="admin-input">${cats?.map(c => `<option value="${c.id}" ${c.id === data?.category_id ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}</select><label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select><label>Emoji</label><input type="text" id="prod-icon" class="admin-input" value="${data?.image_icon || '📦'}"><label>Image URL</label><input type="url" id="prod-image" class="admin-input" value="${data?.image_url || ''}"><label>Description</label><textarea id="prod-desc" class="admin-input" rows="3">${escapeHtml(data?.description || '')}</textarea><label><input type="checkbox" id="prod-featured" ${data?.featured ? 'checked' : ''}> Featured</label><div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.updateProduct(${id})">Update</button></div>`);
+    openModal(`<h3>Edit Product</h3>
+        <label>Name</label><input type="text" id="prod-name" class="admin-input" value="${escapeHtml(data?.name || '')}">
+        <label>Price</label><input type="number" id="prod-price" class="admin-input" value="${data?.price || 0}">
+        <label>Discount %</label><input type="number" id="prod-discount" class="admin-input" value="${data?.discount_percent || 0}">
+        <label>Stock Quantity</label><input type="number" id="prod-stock" class="admin-input" value="${data?.stock_quantity || 10}">
+        <label>Low Stock Alert</label><input type="number" id="prod-low-stock" class="admin-input" value="${data?.low_stock_alert || 5}">
+        <label>Category</label><select id="prod-cat" class="admin-input">${cats?.map(c => `<option value="${c.id}" ${c.id === data?.category_id ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}</select>
+        <label>Subcategory</label><select id="prod-sub" class="admin-input"><option value="">None</option></select>
+        <label>Emoji</label><input type="text" id="prod-icon" class="admin-input" value="${data?.image_icon || '📦'}">
+        <label>Image URL</label><input type="url" id="prod-image" class="admin-input" value="${data?.image_url || ''}">
+        <label>Description</label><textarea id="prod-desc" class="admin-input" rows="3">${escapeHtml(data?.description || '')}</textarea>
+        <label><input type="checkbox" id="prod-featured" ${data?.featured ? 'checked' : ''}> Featured</label>
+        <div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.updateProduct(${id})">Update</button></div>`);
     const subs = await supabase.from('subcategories').select('*').eq('category_id', data?.category_id);
     const subSelect = document.getElementById('prod-sub');
     if (subSelect) subSelect.innerHTML = '<option value="">None</option>' + (subs.data?.map(s => `<option value="${s.id}" ${s.id === data?.subcategory_id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('') || '');
@@ -1048,6 +1268,9 @@ async function updateProduct(id) {
     if (!name || !price) return;
     await supabase.from('products').update({
         name, price,
+        discount_percent: parseInt(document.getElementById('prod-discount')?.value) || 0,
+        stock_quantity: parseInt(document.getElementById('prod-stock')?.value) || 10,
+        low_stock_alert: parseInt(document.getElementById('prod-low-stock')?.value) || 5,
         category_id: parseInt(document.getElementById('prod-cat')?.value) || null,
         subcategory_id: parseInt(document.getElementById('prod-sub')?.value) || null,
         image_icon: document.getElementById('prod-icon')?.value,
@@ -1068,6 +1291,52 @@ async function deleteProduct(id) {
     showToast('Product deleted', 'success');
 }
 
+// Blog CRUD
+async function showAddBlogPost() {
+    openModal(`<h3>Add Blog Post</h3>
+        <label>Title</label><input type="text" id="blog-title" class="admin-input">
+        <label>Date</label><input type="date" id="blog-date" class="admin-input" value="${new Date().toISOString().split('T')[0]}">
+        <label>Content</label><textarea id="blog-content" class="admin-input" rows="6"></textarea>
+        <div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.saveBlogPost()">Save</button></div>`);
+}
+async function saveBlogPost() {
+    const title = document.getElementById('blog-title')?.value.trim();
+    const content = document.getElementById('blog-content')?.value.trim();
+    const date = document.getElementById('blog-date')?.value;
+    if (!title || !content) { showToast('Title and content required', 'error'); return; }
+    await supabase.from('blog_posts').insert([{ title, content, date, published: true }]);
+    closeModal();
+    await renderAdminPanels();
+    await loadBlogPosts();
+    showToast('Blog post added', 'success');
+}
+async function editBlogPost(id) {
+    const { data } = await supabase.from('blog_posts').select('*').eq('id', id).single();
+    openModal(`<h3>Edit Blog Post</h3>
+        <label>Title</label><input type="text" id="blog-title" class="admin-input" value="${escapeHtml(data?.title || '')}">
+        <label>Date</label><input type="date" id="blog-date" class="admin-input" value="${data?.date || ''}">
+        <label>Content</label><textarea id="blog-content" class="admin-input" rows="6">${escapeHtml(data?.content || '')}</textarea>
+        <div class="modal-actions"><button class="btn-secondary" onclick="window.closeModal()">Cancel</button><button class="btn-primary" onclick="window.updateBlogPost(${id})">Update</button></div>`);
+}
+async function updateBlogPost(id) {
+    const title = document.getElementById('blog-title')?.value.trim();
+    const content = document.getElementById('blog-content')?.value.trim();
+    const date = document.getElementById('blog-date')?.value;
+    if (!title || !content) return;
+    await supabase.from('blog_posts').update({ title, content, date }).eq('id', id);
+    closeModal();
+    await renderAdminPanels();
+    await loadBlogPosts();
+    showToast('Blog post updated', 'success');
+}
+async function deleteBlogPost(id) {
+    if (!confirm('Delete this blog post?')) return;
+    await supabase.from('blog_posts').delete().eq('id', id);
+    await renderAdminPanels();
+    await loadBlogPosts();
+    showToast('Blog post deleted', 'success');
+}
+
 function openModal(html) {
     document.getElementById('admin-modal-content').innerHTML = html;
     document.getElementById('admin-modal').classList.add('active');
@@ -1076,7 +1345,9 @@ function openModal(html) {
 function shareToWhatsAppStatus(productId) {
     const product = state.allProducts?.find(p => p.id === productId);
     if (!product) return;
-    const shareText = `🛍️ ${product.name}%0a💰 ₦${product.price?.toLocaleString()}%0a%0a✨ Available at Abihani Express%0a%0a🛒 Order now: ${window.location.origin}`;
+    const siteUrl = window.location.origin;
+    const finalPrice = product.discount_percent ? product.price * (1 - product.discount_percent / 100) : product.price;
+    const shareText = `🛍️ ${product.name}%0a💰 ₦${Math.round(finalPrice).toLocaleString()}%0a%0a✨ Available at Abihani Express%0a%0a🛒 Order now: ${siteUrl}`;
     window.open(`https://wa.me/?text=${shareText}`, '_blank');
 }
 
@@ -1084,71 +1355,59 @@ function shareToWhatsAppStatus(productId) {
 // INITIALIZATION
 // ============================================
 
-// Setup click handlers for data-page elements
 document.addEventListener('click', (e) => {
-    // Close modals when clicking overlay
     if (e.target === document.getElementById('admin-modal')) closeModal();
     if (e.target === document.getElementById('custom-order-popup')) closeCustomOrderPopup();
     if (e.target === document.getElementById('book-popup')) closeBookPopup();
     if (e.target === document.getElementById('artisan-popup')) closeArtisanPopup();
     
-    // Handle data-page clicks
     const pageLink = e.target.closest('[data-page]');
     if (pageLink) {
         e.preventDefault();
         const page = pageLink.getAttribute('data-page');
         const scroll = pageLink.getAttribute('data-scroll') === 'books';
-        if (page === 'about' && scroll) {
-            scrollToBooks();
-        } else if (page) {
-            showPage(page);
-        }
+        if (page === 'about' && scroll) scrollToBooks();
+        else if (page) showPage(page);
     }
 });
 
-// Setup search input
-const searchInput = document.getElementById('search-input');
-if (searchInput) {
-    searchInput.addEventListener('keyup', searchProducts);
-}
+document.getElementById('search-input')?.addEventListener('keyup', searchProducts);
+document.getElementById('menu-toggle')?.addEventListener('click', toggleMobileMenu);
 
-// Setup menu toggle
-const menuToggle = document.getElementById('menu-toggle');
-if (menuToggle) {
-    menuToggle.addEventListener('click', toggleMobileMenu);
-}
-
-// Initialize on load
 window.addEventListener('load', async () => {
-    console.log('App loading...');
+    console.log('Abihani Express loading...');
+    initBackToTop();
     await loadSiteSettings();
     await loadCategories();
     await loadSubcategories();
     await loadFeaturedProducts();
     await loadAllProducts();
+    await loadBlogPosts();
     handleHashChange();
     
     const savedFilter = sessionStorage.getItem('filterCategory');
     if (savedFilter) { 
         sessionStorage.removeItem('filterCategory'); 
-        filterByCategory(parseInt(savedFilter)); 
+        const catFilter = document.getElementById('filter-category');
+        if (catFilter) catFilter.value = savedFilter;
+        applyFilters();
     }
-    console.log('App loaded successfully!');
+    console.log('Abihani Express ready!');
 });
 
-// ============================================
-// EXPOSE ALL FUNCTIONS TO GLOBAL SCOPE
-// ============================================
-
+// Expose all functions to window
 window.showPage = showPage;
 window.toggleTheme = toggleTheme;
 window.showProductDetail = showProductDetail;
-window.buyNow = buyNow;
+window.openWASummary = openWASummary;
+window.closeWASummary = closeWASummary;
+window.confirmAndSendWA = confirmAndSendWA;
 window.setSlide = setSlide;
 window.filterByCategory = filterByCategory;
 window.filterAllProducts = filterAllProducts;
 window.filterByCategoryAndGoToShop = filterByCategoryAndGoToShop;
 window.searchProducts = searchProducts;
+window.applyFilters = applyFilters;
 window.submitFeedback = submitFeedback;
 window.adminLogin = adminLogin;
 window.logoutAdmin = logoutAdmin;
@@ -1171,6 +1430,11 @@ window.editProduct = editProduct;
 window.updateProduct = updateProduct;
 window.deleteProduct = deleteProduct;
 window.toggleFeatured = toggleFeatured;
+window.showAddBlogPost = showAddBlogPost;
+window.saveBlogPost = saveBlogPost;
+window.editBlogPost = editBlogPost;
+window.updateBlogPost = updateBlogPost;
+window.deleteBlogPost = deleteBlogPost;
 window.openCustomOrderPopup = openCustomOrderPopup;
 window.closeCustomOrderPopup = closeCustomOrderPopup;
 window.submitCustomOrder = submitCustomOrder;
@@ -1185,4 +1449,4 @@ window.closeMobileMenu = closeMobileMenu;
 window.closeAnnouncement = closeAnnouncement;
 window.deleteFeedback = deleteFeedback;
 
-console.log('All functions exposed to window object');
+console.log('✅ All functions exposed - Website ready!');
