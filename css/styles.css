@@ -1,3 +1,8 @@
+/* ============================================
+   ABIHANI EXPRESS - COMPLETE STYLES
+   Contains all 17 upgrades + new features
+   ============================================ */
+
 /* ----- RESET & VARIABLES ----- */
 * {
     margin: 0;
@@ -56,7 +61,7 @@ body {
     flex-direction: column;
 }
 
-/* Leather Texture */
+/* Leather Texture Background - Upgrade #1 */
 body::before {
     content: '';
     position: fixed;
@@ -80,7 +85,7 @@ main {
     padding-bottom: 80px;
 }
 
-/* Header */
+/* ----- HEADER ----- */
 .app-header {
     padding: 20px 0;
     background: var(--bg-primary);
@@ -147,9 +152,41 @@ main {
     color: var(--accent);
 }
 
-/* Slider */
+/* ----- ANNOUNCEMENT BAR - Upgrade #10 & #12 ----- */
+.announcement-bar {
+    background: linear-gradient(135deg, var(--accent), #9b5e36);
+    color: white;
+    text-align: center;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    width: 90%;
+    margin: 10px auto 0 auto;
+    border-radius: 50px;
+}
+
+.announcement-bar i.fa-times {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.announcement-bar i.fa-times:hover {
+    opacity: 1;
+}
+
+.announcement-bar.closed {
+    display: none;
+}
+
+/* ----- HERO SLIDER - Upgrade #6 ----- */
 .slider-container {
-    margin: 12px 0 0;
+    margin: 20px 0 0;
 }
 
 .slider-card {
@@ -198,7 +235,7 @@ main {
     opacity: 1;
 }
 
-/* Nigeria Badge */
+/* ----- NIGERIA BADGE - Upgrade #2 ----- */
 .nigeria-badge {
     display: block;
     text-align: center;
@@ -218,7 +255,7 @@ main {
     color: #ffffff;
 }
 
-/* Action Buttons */
+/* ----- ACTION BUTTONS ----- */
 .action-row {
     display: flex;
     gap: 16px;
@@ -247,6 +284,12 @@ main {
     filter: brightness(1.05);
 }
 
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .btn-secondary {
     padding: 14px 32px;
     border-radius: var(--radius-pill);
@@ -268,16 +311,16 @@ main {
     color: white;
 }
 
-/* Section Titles */
+/* ----- SECTION TITLES ----- */
 .section-title {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin: 48px 0 24px;
+    margin: 40px 0 20px;
 }
 
 .section-title h3 {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
     font-family: 'Playfair Display', serif;
 }
@@ -289,7 +332,7 @@ main {
     cursor: pointer;
 }
 
-/* Category Pills */
+/* ----- CATEGORY PILLS (Horizontal Scroll on Mobile) ----- */
 .category-scroll {
     display: flex;
     gap: 16px;
@@ -327,14 +370,7 @@ main {
     border-color: var(--accent);
 }
 
-/* Product Grid & Cards */
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 30px;
-    margin: 30px 0;
-}
-
+/* ----- PRODUCT SCROLL (Horizontal on Mobile) ----- */
 .product-scroll {
     display: flex;
     gap: 20px;
@@ -347,6 +383,15 @@ main {
     display: none;
 }
 
+/* ----- PRODUCT GRID (Desktop) ----- */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 30px;
+    margin: 30px 0;
+}
+
+/* ----- PRODUCT CARD ----- */
 .product-card {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
@@ -370,6 +415,33 @@ main {
     align-items: center;
     justify-content: center;
     font-size: 48px;
+    position: relative;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #e74c3c;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    z-index: 2;
+}
+
+.low-stock-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    color: #ff9800;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 20px;
+    z-index: 2;
 }
 
 .product-image img {
@@ -379,27 +451,34 @@ main {
 }
 
 .product-info {
-    padding: 20px;
+    padding: 16px;
 }
 
 .product-info h4 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .product-price {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--accent);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+}
+
+.original-price {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    margin-left: 8px;
 }
 
 .product-rating {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
 }
 
@@ -438,11 +517,37 @@ main {
     gap: 8px;
 }
 
-.btn-wa-small:hover {
+.btn-wa-small:hover:not(:disabled) {
     filter: brightness(1.05);
 }
 
-/* Product Detail Page */
+.btn-wa-small:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-share-wa-status {
+    background: #128C7E;
+    color: white;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.btn-share-wa-status:hover {
+    filter: brightness(1.1);
+}
+
+/* ----- PRODUCT DETAIL PAGE ----- */
 .product-detail-container {
     display: flex;
     flex-wrap: wrap;
@@ -453,21 +558,47 @@ main {
     margin: 20px 0;
 }
 
-.product-detail-image {
+.product-detail-images {
     flex: 1;
-    min-width: 250px;
+    min-width: 280px;
+}
+
+.product-detail-main-image {
+    width: 100%;
+    aspect-ratio: 1;
     background: var(--bg-secondary);
     border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    margin-bottom: 16px;
 }
 
-.product-detail-image img {
+.product-detail-main-image img {
     width: 100%;
-    height: auto;
+    height: 100%;
     object-fit: cover;
+}
+
+.product-detail-thumbnails {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.product-detail-thumbnails img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.product-detail-thumbnails img:hover {
+    border-color: var(--accent);
 }
 
 .product-detail-info {
@@ -484,7 +615,14 @@ main {
     font-size: 32px;
     font-weight: 700;
     color: var(--accent);
-    margin-bottom: 16px;
+    margin-bottom: 8px;
+}
+
+.product-detail-original-price {
+    font-size: 18px;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    margin-left: 12px;
 }
 
 .product-detail-rating {
@@ -492,6 +630,29 @@ main {
     align-items: center;
     gap: 10px;
     margin-bottom: 20px;
+}
+
+.product-detail-stock {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.stock-in-stock {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.stock-low {
+    color: #e67e22;
+    font-weight: 600;
+}
+
+.stock-out {
+    color: #e74c3c;
+    font-weight: 600;
 }
 
 .product-detail-meta {
@@ -512,6 +673,10 @@ main {
     font-size: 14px;
 }
 
+.product-detail-description {
+    margin-bottom: 20px;
+}
+
 .product-detail-description h4 {
     font-size: 18px;
     margin-bottom: 10px;
@@ -522,7 +687,28 @@ main {
     line-height: 1.6;
 }
 
-/* Trust Badges */
+/* ----- "YOU MIGHT ALSO LIKE" Section ----- */
+.related-products {
+    margin-top: 40px;
+}
+
+.related-products h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.related-scroll {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+.related-scroll .product-card {
+    min-width: 200px;
+}
+
+/* ----- TRUST BADGES - Upgrade #5 ----- */
 .trust-badges {
     display: flex;
     justify-content: space-between;
@@ -546,11 +732,11 @@ main {
     color: var(--accent);
 }
 
-/* Sustainability Section */
+/* ----- SUSTAINABILITY SECTION - Upgrade #4 ----- */
 .sustainability-section {
     background: linear-gradient(135deg, var(--accent-light), var(--bg-card));
     border-radius: var(--radius-lg);
-    padding: 60px 40px;
+    padding: 50px 40px;
     margin: 40px 0;
     text-align: center;
     border: 1px solid var(--border);
@@ -565,6 +751,12 @@ main {
     font-size: 28px;
     font-weight: 700;
     margin: 20px 0 12px;
+}
+
+.sustainability-section p {
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--text-secondary);
 }
 
 .sustainability-badges {
@@ -585,7 +777,7 @@ main {
     font-size: 14px;
 }
 
-/* Artisan Section */
+/* ----- ARTISAN SECTION - Upgrade #7 ----- */
 .artisan-section {
     display: flex;
     align-items: center;
@@ -634,7 +826,7 @@ main {
     margin-bottom: 16px;
 }
 
-/* Artisan Popup */
+/* ----- ARTISAN POPUP MODAL ----- */
 .artisan-popup-overlay {
     display: none;
     position: fixed;
@@ -657,7 +849,6 @@ main {
     max-height: 85vh;
     overflow-y: auto;
     position: relative;
-    animation: fadeInUp 0.3s ease;
 }
 
 .artisan-popup-close {
@@ -715,7 +906,7 @@ main {
     margin-bottom: 12px;
 }
 
-/* CEO Image Styles */
+/* ----- IMAGE STYLES ----- */
 .ceo-image {
     width: 160px;
     height: 220px;
@@ -770,7 +961,7 @@ main {
     line-height: 1.6;
 }
 
-/* Info Card */
+/* ----- INFO CARD ----- */
 .info-card {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
@@ -791,7 +982,7 @@ main {
     line-height: 1.6;
 }
 
-/* Books Section */
+/* ----- BOOKS SECTION - Upgrade #12 ----- */
 .books-container {
     display: flex;
     flex-wrap: wrap;
@@ -863,21 +1054,20 @@ main {
     cursor: pointer;
     transition: filter 0.15s;
     text-decoration: none;
+    border: none;
 }
 
 .btn-book-download {
     background: #25D366;
     color: white;
-    border: none;
 }
 
 .btn-book-buy {
     background: var(--accent);
     color: white;
-    border: none;
 }
 
-/* Book Popup */
+/* ----- BOOK POPUP ----- */
 .book-popup-overlay {
     display: none;
     position: fixed;
@@ -964,9 +1154,11 @@ main {
     text-decoration: none;
     border-radius: var(--radius-pill);
     font-weight: 600;
+    border: none;
+    cursor: pointer;
 }
 
-/* Custom Order Popup */
+/* ----- CUSTOM ORDER POPUP - Upgrade #13 ----- */
 .custom-order-overlay {
     display: none;
     position: fixed;
@@ -1021,7 +1213,11 @@ main {
     color: var(--text-secondary);
 }
 
-.form-group input, .form-group textarea {
+.form-group label .required {
+    color: #e74c3c;
+}
+
+.form-group input, .form-group textarea, .form-group select {
     width: 100%;
     padding: 12px 16px;
     border-radius: 40px;
@@ -1053,7 +1249,49 @@ main {
     margin-top: 10px;
 }
 
-/* Admin Dashboard */
+/* ----- WHATSAPP ORDER SUMMARY POPUP ----- */
+.wa-summary-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1002;
+    justify-content: center;
+    align-items: center;
+}
+
+.wa-summary-content {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    max-width: 400px;
+    width: 90%;
+    padding: 30px;
+    text-align: center;
+}
+
+.wa-summary-content h3 {
+    margin-bottom: 20px;
+    color: var(--accent);
+}
+
+.wa-summary-content p {
+    margin-bottom: 10px;
+}
+
+.wa-summary-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.wa-summary-actions button {
+    flex: 1;
+}
+
+/* ----- ADMIN DASHBOARD - Upgrade #17 ----- */
 .admin-login-box {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
@@ -1124,7 +1362,7 @@ main {
     margin: 12px 0 4px;
 }
 
-/* Modal */
+/* ----- MODAL ----- */
 .modal-overlay {
     display: flex;
     visibility: hidden;
@@ -1168,7 +1406,25 @@ main {
     flex: 1;
 }
 
-/* Theme Toggle */
+/* ----- IMAGE UPLOAD AREA ----- */
+.image-upload-area {
+    border: 2px dashed var(--accent);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    text-align: center;
+    margin: 10px 0;
+    cursor: pointer;
+    position: relative;
+    background: var(--bg-secondary);
+}
+
+.image-upload-area img {
+    max-width: 100%;
+    max-height: 100px;
+    border-radius: var(--radius-sm);
+}
+
+/* ----- THEME TOGGLE PILL - Upgrade #9 ----- */
 .theme-toggle, .mobile-theme-toggle {
     display: flex;
     align-items: center;
@@ -1210,7 +1466,7 @@ body.dark-mode .toggle-knob {
     left: 41px;
 }
 
-/* Mobile Menu */
+/* ----- MOBILE MENU (Hamburger) - Upgrade #8 ----- */
 .fa-bars {
     display: block;
     cursor: pointer;
@@ -1267,45 +1523,7 @@ body.dark-mode .toggle-knob {
     to { opacity: 1; transform: translateY(0); }
 }
 
-@media (min-width: 768px) {
-    .fa-bars {
-        display: none;
-    }
-    .mobile-menu {
-        display: none !important;
-    }
-}
-
-/* Announcement Bar */
-.announcement-bar {
-    background: linear-gradient(135deg, var(--accent), #9b5e36);
-    color: white;
-    text-align: center;
-    padding: 12px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    width: 90%;
-    margin: 0 auto;
-    border-radius: 50px;
-    position: relative;
-    top: 10px;
-}
-
-.announcement-bar i.fa-times {
-    cursor: pointer;
-    opacity: 0.8;
-}
-
-.announcement-bar.closed {
-    display: none;
-}
-
-/* Footer */
+/* ----- FOOTER ----- */
 .app-footer {
     background: var(--bg-secondary);
     padding: 40px 0 30px;
@@ -1362,7 +1580,7 @@ body.dark-mode .toggle-knob {
     color: var(--accent);
 }
 
-/* Bottom Nav */
+/* ----- BOTTOM NAVIGATION (Mobile) ----- */
 .bottom-nav {
     display: none;
     position: fixed;
@@ -1396,7 +1614,35 @@ body.dark-mode .toggle-knob {
     color: var(--accent);
 }
 
-/* Social Icons */
+/* ----- BACK TO TOP BUTTON - Suggestion #2 ----- */
+.back-to-top {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s;
+}
+
+.back-to-top:hover {
+    transform: translateY(-3px);
+}
+
+.back-to-top.visible {
+    display: flex;
+}
+
+/* ----- SOCIAL ICONS ----- */
 .social-icons {
     display: flex;
     gap: 20px;
@@ -1414,7 +1660,7 @@ body.dark-mode .toggle-knob {
     color: var(--accent);
 }
 
-/* Toast */
+/* ----- TOAST NOTIFICATIONS ----- */
 #toast-container {
     position: fixed;
     top: 20px;
@@ -1444,63 +1690,7 @@ body.dark-mode .toggle-knob {
 .toast-error { background: #e74c3c; }
 .toast-info { background: var(--accent); }
 
-/* Skeleton Loading */
-.skeleton {
-    background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border) 50%, var(--bg-secondary) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: var(--radius-md);
-}
-
-@keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-.skeleton-card {
-    height: 300px;
-    border-radius: var(--radius-lg);
-}
-
-.skeleton-pill {
-    width: 100px;
-    height: 44px;
-    border-radius: var(--radius-pill);
-    display: inline-block;
-}
-
-.skeleton-slider {
-    height: 300px;
-    border-radius: var(--radius-lg);
-}
-
-/* Share Button */
-.btn-share-wa-status {
-    background: #128C7E;
-    color: white;
-    border: none;
-    border-radius: var(--radius-pill);
-    padding: 8px 12px;
-    font-size: 12px;
-    font-weight: 600;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    cursor: pointer;
-    margin-top: 8px;
-}
-
-.btn-share-wa-status:hover {
-    filter: brightness(1.1);
-}
-
-.text-warning {
-    color: #FFD700;
-}
-
-/* Page Sections */
+/* ----- PAGE SECTIONS ----- */
 .page-section {
     display: none;
 }
@@ -1515,7 +1705,7 @@ body.dark-mode .toggle-knob {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Feature Unavailable */
+/* ----- FEATURE UNAVAILABLE ----- */
 .feature-unavailable {
     text-align: center;
     padding: 60px 20px;
@@ -1524,15 +1714,28 @@ body.dark-mode .toggle-knob {
     margin: 40px 0;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
+/* ============================================
+   RESPONSIVE DESIGN - Mobile First
+   ============================================ */
+
+/* Mobile (up to 768px) */
+@media (max-width: 768px) {
     .container {
         padding: 0 16px;
+    }
+    
+    .desktop-nav {
+        display: none;
+    }
+    
+    .bottom-nav {
+        display: flex;
     }
     
     .artisan-section {
         flex-direction: column;
         padding: 30px;
+        gap: 30px;
     }
     
     .section-left, .section-right {
@@ -1553,14 +1756,6 @@ body.dark-mode .toggle-knob {
     .footer-row {
         flex-direction: column;
         text-align: center;
-    }
-    
-    .bottom-nav {
-        display: flex;
-    }
-    
-    .desktop-nav {
-        display: none;
     }
     
     .product-grid {
@@ -1597,10 +1792,51 @@ body.dark-mode .toggle-knob {
     .book-popup-body {
         flex-direction: column;
     }
+    
+    .action-row .btn-primary,
+    .action-row .btn-secondary {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+    
+    .section-title h3 {
+        font-size: 20px;
+    }
+    
+    .category-pill {
+        padding: 8px 20px;
+        font-size: 14px;
+    }
+    
+    .back-to-top {
+        bottom: 70px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+    }
 }
 
+/* Desktop (768px and up) */
+@media (min-width: 768px) {
+    .fa-bars {
+        display: none;
+    }
+    
+    .mobile-menu {
+        display: none !important;
+    }
+}
+
+/* Tablet (768px to 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+}
+
+/* Desktop (1024px and up) */
 @media (min-width: 1024px) {
     .product-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
-  }
+}
