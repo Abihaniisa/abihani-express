@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Announcement Bar -->
+    <!-- Announcement Bar - Upgrade #10 -->
     <div id="announcement-bar" class="announcement-bar">
         <span>🎉 NEW: Handcrafted Leather Collection just dropped! Free delivery on orders over ₦50,000 🎉</span>
         <i class="fas fa-times" onclick="closeAnnouncement()"></i>
@@ -41,7 +41,7 @@
         </div>
     </header>
 
-    <!-- Mobile Menu -->
+    <!-- Mobile Menu (Hamburger) - Upgrade #8 -->
     <div id="mobile-menu" class="mobile-menu">
         <a href="#home" data-page="home"><i class="fas fa-home"></i> Home</a>
         <a href="#shop" data-page="shop"><i class="fas fa-store"></i> Shop</a>
@@ -61,19 +61,35 @@
     <main class="container">
         <!-- HOME PAGE -->
         <div id="home-page" class="page-section active-page">
+            <!-- Hero Slider - Upgrade #6 -->
             <div class="slider-container" id="slider-container"></div>
+            
+            <!-- Nigeria Badge - Upgrade #2 -->
             <div class="nigeria-badge"><i class="fas fa-map-marker-alt"></i> Abihani Nig Ltd 🇳🇬</div>
+            
             <div class="action-row">
                 <button class="btn-primary" data-page="shop"><i class="fas fa-store"></i> Explore Collection</button>
                 <button class="btn-secondary" onclick="openCustomOrderPopup()"><i class="fas fa-pen-alt"></i> Custom Order</button>
             </div>
+            
+            <!-- Shop by Categories -->
             <div class="section-title"><h3>Shop by Categories</h3><a href="#shop" data-page="shop">See all</a></div>
             <div class="category-scroll" id="categories-home"></div>
+            
+            <!-- Featured Products -->
             <div class="section-title"><h3>⭐ Featured Products</h3><a href="#shop" data-page="shop">See all</a></div>
             <div class="product-scroll" id="featured-products"></div>
+            
+            <!-- Trust Badges - Upgrade #5 -->
             <div id="trust-badges-container"></div>
+            
+            <!-- Eco Section - Upgrade #4 -->
             <div id="eco-section-container"></div>
+            
+            <!-- Master Artisan Section - Upgrade #7 -->
             <div id="artisan-section-container"></div>
+            
+            <!-- About Sections -->
             <div id="info-sections"></div>
             <div id="mission-section"></div>
         </div>
@@ -81,47 +97,28 @@
         <!-- SHOP PAGE -->
         <div id="shop-page" class="page-section">
             <div class="section-title"><h3>All Products</h3><i class="fas fa-sliders-h" style="color: var(--accent);"></i></div>
+            <!-- Filter Bar will be injected here by JS -->
             <div class="category-scroll" id="categories-filter"></div>
             <div class="product-grid" id="all-products-grid"></div>
         </div>
 
-        <!-- PRODUCT DETAIL PAGE -->
-        <div id="product-detail-page" class="page-section"><div id="product-detail-container"></div></div>
+        <!-- PRODUCT DETAIL PAGE - Upgrade #15 -->
+        <div id="product-detail-page" class="page-section">
+            <div id="product-detail-container"></div>
+        </div>
 
         <!-- SEARCH PAGE -->
         <div id="search-page" class="page-section">
             <div class="search-box" style="margin:20px 0;">
-                <input type="text" id="search-input" placeholder="Search by name or price..." class="admin-input" style="border-radius:60px;">
+                <input type="text" id="search-input" placeholder="Search by name..." class="admin-input" style="border-radius:60px;">
             </div>
             <div id="search-results" class="product-grid"></div>
         </div>
 
-        <!-- ADMIN LOGIN PAGE -->
-        <div id="admin-login-page" class="page-section">
-            <div class="admin-login-box">
-                <h2 style="text-align:center;">🔐 Admin Portal</h2>
-                <p style="text-align:center; font-size:13px; margin-bottom:20px;">Only for Abihani Express administrators</p>
-                <input type="email" id="admin-email" placeholder="Email" class="admin-input">
-                <input type="password" id="admin-password" placeholder="Password" class="admin-input">
-                <button class="btn-primary" style="width:100%;" onclick="window.adminLogin()">Log In</button>
-            </div>
-        </div>
-
-        <!-- ADMIN DASHBOARD -->
-        <div id="admin-dashboard-page" class="page-section">
-            <div style="display:flex; justify-content:space-between; margin:20px 0; flex-wrap:wrap; gap:10px;">
-                <h3>👑 Admin Dashboard</h3>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-secondary" onclick="window.editSiteSettings()">⚙️ Edit Site Settings</button>
-                    <button class="btn-secondary" onclick="window.logoutAdmin()">Logout</button>
-                </div>
-            </div>
-            <div class="admin-dashboard-grid">
-                <div class="admin-card"><div style="display:flex; justify-content:space-between;"><h4><i class="fas fa-folder"></i> Categories</h4><i class="fas fa-plus-circle" style="color:var(--accent); font-size:24px; cursor:pointer;" onclick="window.showAddCategory()"></i></div><div id="admin-categories-list"></div></div>
-                <div class="admin-card"><div style="display:flex; justify-content:space-between;"><h4><i class="fas fa-folder-open"></i> Subcategories</h4><i class="fas fa-plus-circle" style="color:var(--accent); font-size:24px; cursor:pointer;" onclick="window.showAddSubcategory()"></i></div><div id="admin-subcategories-list"></div></div>
-                <div class="admin-card"><div style="display:flex; justify-content:space-between;"><h4><i class="fas fa-tag"></i> Products</h4><i class="fas fa-plus-circle" style="color:var(--accent); font-size:24px; cursor:pointer;" onclick="window.showAddProduct()"></i></div><div id="admin-products-list"></div></div>
-                <div class="admin-card"><div style="display:flex; justify-content:space-between;"><h4><i class="fas fa-comment"></i> Customer Feedback</h4><button class="btn-secondary" style="padding:4px 12px;" onclick="renderAdminPanels()">Refresh</button></div><div id="admin-feedback-list"></div></div>
-            </div>
+        <!-- BLOG SECTION - Suggestion #10 -->
+        <div id="blog-page" class="page-section">
+            <div class="section-title"><h3>📝 Latest Updates</h3></div>
+            <div id="blog-posts-container"></div>
         </div>
 
         <!-- ABOUT PAGE -->
@@ -154,13 +151,42 @@
             <div class="social-icons" id="social-links"></div>
         </div>
 
-        <!-- PROFILE PAGE -->
+        <!-- PROFILE / ADMIN LOGIN PAGE -->
         <div id="profile-page" class="page-section">
             <div class="feature-unavailable">
                 <i class="fas fa-lock" style="font-size:48px; color:var(--accent);"></i>
                 <h4>Admin Portal</h4>
                 <p style="margin:10px 0;">Only for Abihani Express administrators</p>
                 <button class="btn-primary" onclick="window.showPage('admin-login')">🔐 Admin Login</button>
+            </div>
+        </div>
+
+        <!-- ADMIN LOGIN PAGE -->
+        <div id="admin-login-page" class="page-section">
+            <div class="admin-login-box">
+                <h2 style="text-align:center;">🔐 Admin Portal</h2>
+                <p style="text-align:center; font-size:13px; margin-bottom:20px;">Only for Abihani Express administrators</p>
+                <input type="email" id="admin-email" placeholder="Email" class="admin-input">
+                <input type="password" id="admin-password" placeholder="Password" class="admin-input">
+                <button class="btn-primary" style="width:100%;" onclick="window.adminLogin()">Log In</button>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD - Upgrade #17 -->
+        <div id="admin-dashboard-page" class="page-section">
+            <div style="display:flex; justify-content:space-between; margin:20px 0; flex-wrap:wrap; gap:10px;">
+                <h3>👑 Admin Dashboard</h3>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-secondary" onclick="window.editSiteSettings()">⚙️ Edit Site Settings</button>
+                    <button class="btn-secondary" onclick="window.logoutAdmin()">Logout</button>
+                </div>
+            </div>
+            <div class="admin-dashboard-grid">
+                <div class="admin-card"><div style="display:flex; justify-content:space-between;"><h4><i class="fas fa-folder"></i> Categories</h4><i class="fas fa-plus-circle" style="color:var(--accent); font-size:24px; cursor:pointer;" onclick="window.showAddCategory()"></i></div><div id="admin-categories-list"></div></div>
+                <div class="admin-card"><div style="display:flex; justify-content:space-between;"><h4><i class="fas fa-folder-open"></i> Subcategories</h4><i class="fas fa-plus-circle" style="color:var(--accent); font-size:24px; cursor:pointer;" onclick="window.showAddSubcategory()"></i></div><div id="admin-subcategories-list"></div></div>
+                <div class="admin-card"><div style="display:flex; justify-content:space-between;"><h4><i class="fas fa-tag"></i> Products</h4><i class="fas fa-plus-circle" style="color:var(--accent); font-size:24px; cursor:pointer;" onclick="window.showAddProduct()"></i></div><div id="admin-products-list"></div></div>
+                <div class="admin-card"><div style="display:flex; justify-content:space-between;"><h4><i class="fas fa-comment"></i> Customer Feedback</h4><button class="btn-secondary" style="padding:4px 12px;" onclick="renderAdminPanels()">Refresh</button></div><div id="admin-feedback-list"></div></div>
+                <div class="admin-card"><div style="display:flex; justify-content:space-between;"><h4><i class="fas fa-newspaper"></i> Blog Posts</h4><i class="fas fa-plus-circle" style="color:var(--accent); font-size:24px; cursor:pointer;" onclick="window.showAddBlogPost()"></i></div><div id="admin-blog-list"></div></div>
             </div>
         </div>
     </main>
@@ -177,7 +203,9 @@
                     <a href="#about" data-page="about">About</a>
                     <a href="#terms" data-page="terms">Terms</a>
                     <a href="#privacy" data-page="privacy">Privacy</a>
+                    <a href="#blog" data-page="blog">Blog</a>
                 </div>
+                <!-- Dark Mode Toggle Pill - Upgrade #9 -->
                 <div class="theme-toggle" onclick="window.toggleTheme()">
                     <i class="fas fa-sun"></i>
                     <i class="fas fa-moon"></i>
@@ -191,7 +219,10 @@
         </div>
     </footer>
 
-    <!-- POPUPS -->
+    <!-- WHATSAPP ORDER SUMMARY POPUP - Suggestion #1 -->
+    <div id="wa-summary-overlay" class="wa-summary-overlay" style="display:none;"></div>
+
+    <!-- BOOK POPUP MODAL -->
     <div id="book-popup" class="book-popup-overlay">
         <div class="book-popup-content">
             <span class="book-popup-close" onclick="closeBookPopup()">&times;</span>
@@ -208,11 +239,19 @@
         </div>
     </div>
 
+    <!-- CUSTOM ORDER POPUP - Upgrade #13 -->
     <div id="custom-order-popup" class="custom-order-overlay"><div id="custom-order-form-container"></div></div>
+
+    <!-- ARTISAN POPUP CONTAINER -->
     <div id="artisan-popup-container"></div>
+
+    <!-- ADMIN MODAL -->
     <div class="modal-overlay" id="admin-modal"><div class="modal-content" id="admin-modal-content"></div></div>
+
+    <!-- TOAST NOTIFICATIONS -->
     <div id="toast-container"></div>
 
+    <!-- BOTTOM NAVIGATION (Mobile) -->
     <div class="bottom-nav">
         <button class="nav-item active" data-page="home" id="nav-home"><i class="fas fa-home"></i><span>Home</span></button>
         <button class="nav-item" data-page="shop" id="nav-shop"><i class="fas fa-th-large"></i><span>Shop</span></button>
@@ -223,4 +262,4 @@
     <script src="js/env.js"></script>
     <script src="js/app.js"></script>
 </body>
-  </html>
+</html>
