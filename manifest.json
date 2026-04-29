@@ -1,0 +1,74 @@
+{
+    "name": "Abihani Express",
+    "short_name": "Abihani",
+    "description": "Premium handcrafted leather goods from Yobe State – Your perfect home for leather works.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#fdf9f5",
+    "theme_color": "#b87c4f",
+    "lang": "en-NG",
+    "categories": ["shopping", "lifestyle"],
+    "icons": [
+        {
+            "src": "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png",
+            "sizes": "152x152",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png",
+            "sizes": "384x384",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png",
+            "sizes": "1080x1920",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Home screen of Abihani Express"
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false
+}

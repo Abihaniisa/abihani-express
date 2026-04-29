@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /#admin-login
+Disallow: /#admin-dashboard
+Disallow: /#admin-requests
+Disallow: /#admin-partners
+Disallow: /#viewing-partner
+Disallow: /#profile
+
+Sitemap: https://www.abihaniexpress.com.ng/sitemap.xml
