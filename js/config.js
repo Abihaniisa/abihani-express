@@ -217,7 +217,7 @@ var CONFIG = {
     ARTISAN_NAME: "Adamu Yahaya (AYFOOTIES)",
     ARTISAN_SHORT_STORY: "With over 15 years of leather crafting experience, Adamu Yahaya leads our workshop in Potiskum, Yobe State. He is the founder and CEO of AY FOOTIES — the seed that grew into our ultimate vision, Abihani Nig Ltd.",
     ARTISAN_FULL_STORY: "Adamu Yahaya, widely known in the leather crafting community as AYFOOTIES, began his journey as a young, talented apprentice in Jos, Plateau State. Over one and a half decades, he mastered the art of handcrafting leather goods — blending traditional Hausa techniques with contemporary design. Every stitch, every cut, every finish reflects his relentless dedication to perfection. Today, he is the founder and CEO of AYFOOTIES — a world-class skin leather brand that gave birth to Abihani Nig Ltd, our giant e-commerce platform for premium leather works. From his workshop in Potiskum, Adamu mentors the next generation of artisans while creating exceptional products for customers across the globe.",
-    ARTISAN_IMAGE: "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/masterartisan.jpg",
+    ARTISAN_IMAGE: "https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/masterartisan2.jpg",
     ARTISAN_WHATSAPP: "08168867633",
     ARTISAN_LEARN_MORE_BUTTON: "Learn More →",
     ARTISAN_BADGE_TEXT: "✨ Master Artisan ✨",
