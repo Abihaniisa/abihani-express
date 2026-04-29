@@ -28,19 +28,6 @@
             ]
         },
         {
-            "source": "/sw.js",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=0, must-revalidate"
-                },
-                {
-                    "key": "Service-Worker-Allowed",
-                    "value": "/"
-                }
-            ]
-        },
-        {
             "source": "/(.*\\.(jpg|jpeg|png|gif|webp|svg|ico|css|js|woff2?))",
             "headers": [
                 {
