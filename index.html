@@ -171,6 +171,20 @@ Domain: www.abihaniexpress.com.ng
 <script src="js/env.js"></script>
 <script src="js/config.js"></script>
 <script src="js/app.js"></script>
-<script>window.addEventListener('load',function(){if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').then(function(r){console.log('PWA ready');}).catch(function(e){console.log('SW failed',e);});}});</script>
+<script>
+function registerSW() {
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(r){console.log('PWA ready');})
+      .catch(function(e){console.log('SW failed',e);});
+  }
+}
+
+if(document.readyState === 'loading') {
+  window.addEventListener('load', registerSW);
+} else {
+  registerSW();
+}
+</script>
 </body>
 </html>
