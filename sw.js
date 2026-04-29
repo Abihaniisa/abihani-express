@@ -21,7 +21,6 @@ self.addEventListener('install', function(e) {
     e.waitUntil(
         caches.open(CACHE_NAME).then(function(cache) {
             return cache.addAll(STATIC_ASSETS).catch(function(err) {
-                // Continue even if some assets fail to cache
                 console.log('SW: Some assets not cached', err);
             });
         })
@@ -47,6 +46,28 @@ self.addEventListener('activate', function(e) {
 
 // Fetch — network first with cache fallback
 self.addEventListener('fetch', function(e) {
+    // Intercept Resend API calls and route through our serverless function
+    if (e.request.url.indexOf('resend.com') !== -1) {
+        e.respondWith(
+            (async function() {
+                try {
+                    var body = await e.request.clone().text();
+                    return await fetch('/api/send-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: body
+                    });
+                } catch (err) {
+                    return new Response(JSON.stringify({ error: err.message }), {
+                        status: 500,
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
+            })()
+        );
+        return;
+    }
+
     // Skip Supabase API calls — don't cache database responses
     if (e.request.url.indexOf('supabase.co') !== -1) {
         e.respondWith(fetch(e.request).catch(function() {
@@ -74,7 +95,6 @@ self.addEventListener('fetch', function(e) {
     // For HTML pages and static assets — network first, fallback to cache
     e.respondWith(
         fetch(e.request).then(function(response) {
-            // Cache successful responses
             var cloned = response.clone();
             caches.open(CACHE_NAME).then(function(cache) {
                 if (e.request.method === 'GET' && response.status === 200) {
@@ -83,10 +103,8 @@ self.addEventListener('fetch', function(e) {
             });
             return response;
         }).catch(function() {
-            // Offline — try cache
             return caches.match(e.request).then(function(cached) {
                 if (cached) return cached;
-                // If HTML request, return offline page
                 if (e.request.headers.get('Accept') && e.request.headers.get('Accept').indexOf('text/html') !== -1) {
                     return caches.match('/index.html');
                 }
