@@ -1,9 +1,3 @@
-<!-- ============================================
-ABIHANI EXPRESS - index.html
-All fixes applied. Connected to config.js
-SEO + PWA Install Ready
-Domain: www.abihaniexpress.com.ng
-============================================ -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,11 +22,13 @@ Domain: www.abihaniexpress.com.ng
     <meta name="twitter:title" content="Abihani Express · Your perfect home for leather works">
     <meta name="twitter:description" content="Premium handcrafted leather goods from Yobe State.">
     <meta name="twitter:image" content="https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/social-share.jpg">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials">
     <meta name="theme-color" content="#b87c4f">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Abihani Express">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png">
     <link rel="apple-touch-icon" href="https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"Organization","name":"Abihani Express","url":"https://www.abihaniexpress.com.ng","logo":"https://hibpuvurlvkuqjawkqlu.supabase.co/storage/v1/object/public/images/logo.png","description":"Premium handcrafted leather goods from Yobe State, Nigeria.","contactPoint":{"@type":"ContactPoint","telephone":"+2347067551684","contactType":"customer service","areaServed":"NG"},"sameAs":["https://www.facebook.com/Abihaniisa","https://www.instagram.com/abihani_isa","https://x.com/abihaniisa01"]}
@@ -47,23 +43,23 @@ Domain: www.abihaniexpress.com.ng
 <header class="app-header"><div class="container"><div class="header-content">
     <div class="logo"><h1>Abihani Express</h1><span>MOM · DAD · UMMIHANI</span></div>
     <nav class="desktop-nav">
-    <a href="#home" onclick="navigateTo('home'); return false;">Home</a>
-    <a href="#shop" onclick="navigateTo('shop'); return false;">Shop</a>
-    <a href="#about" onclick="navigateTo('about'); return false;">About</a>
-    <a href="#contact" onclick="navigateTo('contact'); return false;">Contact</a>
-    <a href="#search" onclick="navigateTo('search'); return false;">Search</a>
-    <a href="#profile" onclick="navigateTo('profile'); return false;">Profile</a>
-</nav>
+        <a href="/" data-page="home" onclick="navigateTo('home'); return false;">Home</a>
+        <a href="/shop" data-page="shop" onclick="navigateTo('shop'); return false;">Shop</a>
+        <a href="/about" data-page="about" onclick="navigateTo('about'); return false;">About</a>
+        <a href="/contact" data-page="contact" onclick="navigateTo('contact'); return false;">Contact</a>
+        <a href="/search" data-page="search" onclick="navigateTo('search'); return false;">Search</a>
+        <a href="/profile" data-page="profile" onclick="navigateTo('profile'); return false;">Profile</a>
+    </nav>
     <div class="header-icons"><i class="fas fa-search" onclick="navigateTo('search')"></i><i class="fas fa-shopping-bag" onclick="navigateTo('shop')"></i><i class="fas fa-bars" id="menu-toggle"></i></div>
 </div></div></header>
 <div id="mobile-menu" class="mobile-menu">
-    <a href="#home" onclick="navigateTo('home'); return false;"><i class="fas fa-home"></i> Home</a>
-    <a href="#shop" onclick="navigateTo('shop'); return false;"><i class="fas fa-store"></i> Shop</a>
-    <a href="#about" onclick="scrollToBooks(); return false;"><i class="fas fa-book"></i> Abihani's Works</a>
-    <a href="#search" onclick="navigateTo('search'); return false;"><i class="fas fa-search"></i> Search</a>
-    <a href="#about" onclick="navigateTo('about'); return false;"><i class="fas fa-info-circle"></i> About</a>
-    <a href="#contact" onclick="navigateTo('contact'); return false;"><i class="fas fa-envelope"></i> Contact</a>
-    <a href="#profile" onclick="navigateTo('profile'); return false;"><i class="fas fa-user"></i> Profile</a>
+    <a href="/" onclick="navigateTo('home'); return false;"><i class="fas fa-home"></i> Home</a>
+    <a href="/shop" onclick="navigateTo('shop'); return false;"><i class="fas fa-store"></i> Shop</a>
+    <a href="/about" onclick="scrollToBooks(); return false;"><i class="fas fa-book"></i> Abihani's Works</a>
+    <a href="/search" onclick="navigateTo('search'); return false;"><i class="fas fa-search"></i> Search</a>
+    <a href="/about" onclick="navigateTo('about'); return false;"><i class="fas fa-info-circle"></i> About</a>
+    <a href="/contact" onclick="navigateTo('contact'); return false;"><i class="fas fa-envelope"></i> Contact</a>
+    <a href="/profile" onclick="navigateTo('profile'); return false;"><i class="fas fa-user"></i> Profile</a>
     <hr><div class="mobile-theme-toggle" onclick="toggleTheme()"><i class="fas fa-sun"></i><i class="fas fa-moon"></i><span class="toggle-knob"></span></div>
 </div>
 <main class="container">
@@ -71,9 +67,9 @@ Domain: www.abihaniexpress.com.ng
         <div id="hero-slider"><div class="slider-track" id="slider-track"></div><div class="slider-dots" id="slider-dots"></div></div>
         <div class="nigeria-badge"><i class="fas fa-map-marker-alt"></i> <span id="nigeria-badge-display"></span> <i class="fas fa-flag"></i></div>
         <div class="action-row"><button class="btn-primary" onclick="navigateTo('shop')"><i class="fas fa-store"></i> Explore Collection</button><button class="btn-secondary" onclick="openCustomOrderPopup()"><i class="fas fa-pen-alt"></i> Custom Order</button></div>
-        <div class="section-title"><h3>Shop by Categories</h3><a href="#shop" onclick="navigateTo('shop'); return false;">See all →</a></div>
+        <div class="section-title"><h3>Shop by Categories</h3><a href="/shop" onclick="navigateTo('shop'); return false;">See all →</a></div>
         <div class="category-scroll" id="categories-home"></div>
-        <div class="section-title"><h3>⭐ Featured Products</h3><a href="#shop" onclick="navigateTo('shop'); return false;">See all →</a></div>
+        <div class="section-title"><h3>⭐ Featured Products</h3><a href="/shop" onclick="navigateTo('shop'); return false;">See all →</a></div>
         <div class="product-scroll" id="featured-products"></div>
         <div class="section-divider"></div>
         <div class="trust-badges" id="trust-badges-container"></div>
@@ -86,7 +82,7 @@ Domain: www.abihaniexpress.com.ng
         <div class="section-divider"></div>
         <div class="section-logo-about"><img src="" class="circle-image-lg" alt="Logo" id="about-logo-img"><div class="text-content"><h3 id="about-logo-title"></h3><p id="about-logo-text"></p></div></div>
         <div class="section-divider"></div>
-        <div class="section-ceo"><img src="" class="ceo-image-lg" alt="CEO" id="ceo-image-display"><div class="text-content"><h3>Meet Abihani Isa</h3><p id="ceo-bio-display"></p><div class="ceo-contact-btns"><a href="#" class="btn btn-primary btn-sm" target="_blank" id="ceo-wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a><a href="#" class="btn btn-outline btn-sm" id="ceo-email-btn"><i class="fas fa-envelope"></i> Email</a></div></div></div>
+        <div class="section-ceo"><div class="text-content"><h3>Meet Abihani Isa</h3><p id="ceo-bio-display"></p><div class="ceo-contact-btns"><a href="#" class="btn-primary btn-sm" target="_blank" id="ceo-wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a><a href="#" class="btn-outline btn-sm" id="ceo-email-btn"><i class="fas fa-envelope"></i> Email</a></div></div><img src="" class="ceo-image-lg" alt="CEO" id="ceo-image-display"></div>
         <div class="info-card" style="text-align:center;"><h4>Our Mission</h4><p id="mission-display"></p></div>
     </div>
     <div id="shop-page" class="page-section">
@@ -95,7 +91,7 @@ Domain: www.abihaniexpress.com.ng
         <div class="category-scroll" id="shop-categories-filter"><div class="category-pill active" onclick="filterAllProducts()">All</div></div>
         <div class="product-grid" id="all-products-grid"></div>
         <div class="section-divider"></div>
-        <div class="section-ceo"><img src="" class="ceo-image-lg" alt="CEO" id="shop-ceo-img"><div class="text-content"><h3>Meet Abihani Isa</h3><p id="shop-ceo-bio-display"></p></div></div>
+        <div class="section-ceo"><div class="text-content"><h3>Meet Abihani Isa</h3><p id="shop-ceo-bio-display"></p></div><img src="" class="ceo-image-lg" alt="CEO" id="shop-ceo-img"></div>
         <div class="info-card" style="text-align:center;"><h4>Our Mission</h4><p id="shop-mission-display"></p></div>
     </div>
     <div id="product-detail-page" class="page-section">
@@ -104,18 +100,18 @@ Domain: www.abihaniexpress.com.ng
         <div id="product-detail-container"></div>
         <div id="product-share-container" style="text-align:right;margin:8px 0;"></div>
         <div class="section-divider"></div>
-        <div id="related-products-section" style="display:none;"><div class="section-title"><h3 id="related-products-heading">You May Also Like</h3></div><div class="product-scroll" id="related-products-scroll"></div></div>
+        <div id="related-products-section"><div class="section-title"><h3>You May Also Like</h3></div><div class="product-scroll" id="related-products-scroll"></div></div>
     </div>
     <div id="search-page" class="page-section">
         <div class="page-back-arrow" onclick="goBackSmart()"><i class="fas fa-arrow-left"></i> Home</div>
-        <div class="search-box"><input type="text" id="search-input" placeholder=""></div>
+        <div class="search-box"><input type="text" id="search-input" placeholder="" autocomplete="off"></div>
         <div id="search-results" class="product-grid"></div>
     </div>
     <div id="about-page" class="page-section">
         <div class="page-back-arrow" onclick="goBackSmart()"><i class="fas fa-arrow-left"></i> Home</div>
         <div class="info-card"><h4>Who We Are</h4><p id="about-who-display"></p></div>
         <div class="info-card"><h4>Our Mission</h4><p id="about-mission-display"></p></div>
-        <div class="section-ceo"><img src="" class="ceo-image-lg" alt="CEO" id="about-ceo-img"><div class="text-content"><h3>Meet Abihani Isa</h3><p id="about-ceo-display"></p></div></div>
+        <div class="section-ceo"><div class="text-content"><h3>Meet Abihani Isa</h3><p id="about-ceo-display"></p></div><img src="" class="ceo-image-lg" alt="CEO" id="about-ceo-img"></div>
         <div class="section-title"><h3></h3></div><div class="books-container" id="books-container"></div>
     </div>
     <div id="terms-page" class="page-section"><div class="page-back-arrow" onclick="goBackSmart()"><i class="fas fa-arrow-left"></i> Home</div><div class="admin-card" id="terms-content"></div></div>
@@ -139,10 +135,10 @@ Domain: www.abihaniexpress.com.ng
         <div class="page-back-arrow" onclick="goBackSmart()"><i class="fas fa-arrow-left"></i> Admin Portal</div>
         <div class="admin-login-box">
             <h2 style="text-align:center;">🔐 Admin Portal</h2>
-            <input type="email" id="admin-email" placeholder="Email" class="admin-input" autocomplete="email" name="email" inputmode="email">
-            <div style="position:relative;"><input type="password" id="admin-password" placeholder="Password" class="admin-input" autocomplete="off" style="padding-right:45px;"><i class="fas fa-eye-slash" id="toggle-password" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text-muted);font-size:18px;"></i></div>
+            <input type="email" id="admin-email" placeholder="Email" class="admin-input" autocomplete="email" inputmode="email">
+            <div style="position:relative;"><input type="password" id="admin-password" placeholder="Password" class="admin-input" autocomplete="new-password" style="padding-right:45px;"><i class="fas fa-eye-slash" id="toggle-password" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text-muted);font-size:18px;"></i></div>
             <button class="btn-primary" style="width:100%;" id="login-btn">Log In</button>
-            <div id="login-toast" style="text-align:center;margin-top:8px;"></div>
+            <div id="login-toast" style="text-align:center;margin-top:8px;min-height:24px;"></div>
             <div style="text-align:center;margin-top:14px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap;align-items:center;">
                 <a href="#" class="login-action-link" onclick="showCreateAccountModal(); return false;">Create an account</a>
                 <a href="#" class="login-action-link" onclick="forgotPassword(); return false;">Forgot your password?</a>
@@ -155,12 +151,53 @@ Domain: www.abihaniexpress.com.ng
         <div id="admin-dashboard-content"></div>
     </div>
 </main>
-<footer class="app-footer"><div class="container"><div class="footer-row"><div class="footer-brand"><h4>Abihani Express</h4><p>Your perfect home for leather works</p></div><div class="footer-links"><a href="#about" onclick="navigateTo('about'); return false;">About</a><a href="#terms" onclick="navigateTo('terms'); return false;">Terms</a><a href="#privacy" onclick="navigateTo('privacy'); return false;">Privacy</a></div><div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-sun"></i><i class="fas fa-moon"></i><span class="toggle-knob"></span></div></div><div class="footer-bottom-row"><button class="contact-btn" onclick="navigateTo('contact')">Feedback & Contact</button><span class="copyright-text">Abihani Express © 2026. All rights reserved.</span></div></div></footer>
-<div id="book-popup" class="book-popup-overlay"><div class="book-popup-content"><span class="book-popup-close" onclick="closeBookPopup()">&times;</span><div class="book-popup-body"><div class="book-popup-image"><img id="book-popup-img" src=""></div><div class="book-popup-info"><h3 id="book-popup-title"></h3><p class="popup-author" id="book-popup-author"></p><div class="book-synopsis"><h4>📖 Synopsis</h4><p id="book-popup-synopsis"></p></div><div class="popup-price"><span id="book-popup-price"></span></div><a href="#" id="book-popup-action-btn" class="btn-popup-wa" target="_blank"><i class="fab fa-whatsapp"></i> Buy via WhatsApp</a></div></div></div></div>
+<footer class="app-footer"><div class="container"><div class="footer-row"><div class="footer-brand"><h4>Abihani Express</h4><p>Your perfect home for leather works</p></div><div class="footer-links"><a href="/about" onclick="navigateTo('about'); return false;">About</a><a href="/terms" onclick="navigateTo('terms'); return false;">Terms</a><a href="/privacy" onclick="navigateTo('privacy'); return false;">Privacy</a></div><div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-sun"></i><i class="fas fa-moon"></i><span class="toggle-knob"></span></div></div><div class="footer-bottom-row"><button class="contact-btn" onclick="navigateTo('contact')">Feedback & Contact</button><span class="copyright-text">Abihani Express © 2026. All rights reserved.</span></div></div></footer>
+<div id="book-popup" class="book-popup-overlay"><div class="book-popup-content"><span class="book-popup-close" onclick="closeBookPopup()">&times;</span><div class="book-popup-body"><div class="book-popup-image"><img id="book-popup-img" src="" alt="Book cover"></div><div class="book-popup-info"><h3 id="book-popup-title"></h3><p class="popup-author" id="book-popup-author"></p><div class="book-synopsis"><h4>📖 Synopsis</h4><p id="book-popup-synopsis"></p></div><div class="popup-price"><span id="book-popup-price"></span></div><a href="#" id="book-popup-action-btn" class="btn-popup-wa" target="_blank"><i class="fab fa-whatsapp"></i> Buy via WhatsApp</a></div></div></div></div>
 <div id="custom-order-popup" class="custom-order-overlay"><div class="custom-order-content"><span class="custom-order-close" onclick="closeCustomOrderPopup()">&times;</span><h3 id="custom-order-popup-title">Custom Order Request</h3><p id="custom-order-popup-subtitle"></p><form id="custom-order-form" onsubmit="submitCustomOrder(event)"></form></div></div>
 <div id="artisan-popup-container"></div>
-<div id="toast-container"></div>
 <div id="admin-form-modal" class="custom-order-overlay" style="display:none;"><div class="custom-order-content" id="admin-form-modal-content"><span class="custom-order-close" onclick="closeAdminModal()">&times;</span></div></div>
+
+<!-- Hani Popup System -->
+<div id="hani-popup-overlay" class="hani-popup-overlay" style="display:none;">
+    <div class="hani-popup-card" id="hani-popup-card">
+        <button class="hani-popup-close" onclick="closeHaniPopup()">✕</button>
+        <img id="hani-popup-avatar" src="" alt="Hani" class="hani-popup-avatar">
+        <h3 id="hani-popup-title"></h3>
+        <p id="hani-popup-message"></p>
+        <div id="hani-popup-actions"></div>
+    </div>
+</div>
+
+<!-- Hani Tour Overlay -->
+<div id="hani-tour-overlay" class="hani-tour-overlay" style="display:none;">
+    <div class="hani-tour-card">
+        <img src="" alt="Hani" class="hani-tour-avatar" id="hani-tour-avatar">
+        <h3 id="hani-tour-title"></h3>
+        <p id="hani-tour-text"></p>
+        <div class="hani-tour-actions" id="hani-tour-actions"></div>
+        <div class="hani-tour-dots" id="hani-tour-dots"></div>
+    </div>
+</div>
+
+<!-- Hani Living Character -->
+<div id="hani-character" class="hani-character" style="display:none;" onclick="toggleHaniChat()">
+    <img src="" alt="Hani" id="hani-char-img">
+    <div class="hani-char-status" id="hani-char-status"></div>
+</div>
+
+<!-- PWA Install Banner -->
+<div id="pwa-install-banner" class="pwa-install-banner" style="display:none;">
+    <div class="pwa-install-content">
+        <img src="" alt="Hani" class="pwa-install-avatar" id="pwa-install-avatar">
+        <div>
+            <strong>Install Abihani Express</strong>
+            <p>Quick access to the finest leather goods. My dad would love that! 🤎</p>
+        </div>
+        <button class="btn-primary btn-sm" onclick="installPWA()">Install</button>
+<button class="btn-secondary btn-sm" onclick="closePWAInstall()">Later</button>
+    </div>
+</div>
+
 <div class="bottom-nav">
     <button class="nav-item active" id="nav-home" onclick="navigateTo('home')"><i class="fas fa-home"></i><span>Home</span></button>
     <button class="nav-item" id="nav-shop" onclick="navigateTo('shop')"><i class="fas fa-th-large"></i><span>Shop</span></button>
@@ -168,23 +205,12 @@ Domain: www.abihaniexpress.com.ng
     <button class="nav-item" id="nav-profile" onclick="navigateTo('profile')"><i class="fas fa-user"></i><span>Profile</span></button>
 </div>
 <button id="scroll-to-top" class="scroll-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
+
 <script src="js/env.js"></script>
 <script src="js/config.js"></script>
 <script src="js/app.js"></script>
-<script>
-function registerSW() {
-  if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(r){console.log('PWA ready');})
-      .catch(function(e){console.log('SW failed',e);});
-  }
-}
 
-if(document.readyState === 'loading') {
-  window.addEventListener('load', registerSW);
-} else {
-  registerSW();
-}
-</script>
+<!-- Hani Botpress Chat -->
+<script src="https://cdn.botpress.cloud/webchat/v3.6/inject.js" defer data-config-url="https://files.bpcontent.cloud/2026/04/30/00/20260430004011-5QCU85DU.json"></script>
 </body>
 </html>

@@ -1,10 +1,4 @@
--- ============================================
--- ABIHANI EXPRESS - master.sql
--- Complete Database & Storage Setup
--- Run this in Supabase SQL Editor (Idempotent)
--- ============================================
-
--- Drop existing policies first (to avoid "already exists" errors)
+-- Drop existing policies
 DROP POLICY IF EXISTS "Public Access for images bucket" ON storage.objects;
 DROP POLICY IF EXISTS "Public Upload to images bucket" ON storage.objects;
 DROP POLICY IF EXISTS "Public Update to images bucket" ON storage.objects;
@@ -20,8 +14,7 @@ DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS admin_applications CASCADE;
 DROP TABLE IF EXISTS admins CASCADE;
 
--- ============ CREATE TABLES ============
-
+-- Create tables
 CREATE TABLE admins (
     id BIGSERIAL PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
@@ -116,8 +109,7 @@ CREATE TABLE messages (
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- ============ INSERT DEFAULT DATA ============
-
+-- Insert default data
 INSERT INTO site_settings (id, announcement_text, mock_data_enabled, mock_data_count, maintenance_mode)
 VALUES (1, '', true, 20, false)
 ON CONFLICT (id) DO UPDATE SET mock_data_enabled = true, maintenance_mode = false;
@@ -129,8 +121,7 @@ VALUES
     ('mrsabihani@gmail.com', '', 'Mrs. Abihani - Aisha Usman Garba', 'Abihani Express', '+2347067551684', 'Owner', 'active')
 ON CONFLICT (email) DO NOTHING;
 
--- ============ DISABLE ROW LEVEL SECURITY ============
-
+-- Disable RLS
 ALTER TABLE admins DISABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_applications DISABLE ROW LEVEL SECURITY;
 ALTER TABLE categories DISABLE ROW LEVEL SECURITY;
@@ -140,20 +131,8 @@ ALTER TABLE site_settings DISABLE ROW LEVEL SECURITY;
 ALTER TABLE feedback DISABLE ROW LEVEL SECURITY;
 ALTER TABLE messages DISABLE ROW LEVEL SECURITY;
 
--- ============ CREATE STORAGE POLICIES (fresh) ============
-
-CREATE POLICY "Public Access for images bucket"
-ON storage.objects FOR SELECT
-USING (bucket_id = 'images');
-
-CREATE POLICY "Public Upload to images bucket"
-ON storage.objects FOR INSERT
-WITH CHECK (bucket_id = 'images');
-
-CREATE POLICY "Public Update to images bucket"
-ON storage.objects FOR UPDATE
-USING (bucket_id = 'images');
-
-CREATE POLICY "Public Delete from images bucket"
-ON storage.objects FOR DELETE
-USING (bucket_id = 'images');
+-- Storage policies
+CREATE POLICY "Public Access for images bucket" ON storage.objects FOR SELECT USING (bucket_id = 'images');
+CREATE POLICY "Public Upload to images bucket" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'images');
+CREATE POLICY "Public Update to images bucket" ON storage.objects FOR UPDATE USING (bucket_id = 'images');
+CREATE POLICY "Public Delete from images bucket" ON storage.objects FOR DELETE USING (bucket_id = 'images');
